@@ -191,6 +191,7 @@ code{font:12px var(--mono);color:var(--text-2)}
       <div class="hud" aria-live="off">
         <div class="box scalebar"><span id="sbLabel">—</span><div class="bar" id="sbBar" style="width:80px"></div></div>
         <div class="box"><div class="mag" id="hudMag">—</div><div id="hudPos" style="color:var(--label)">—</div></div>
+        <div class="box" id="hudLoad" hidden style="color:var(--amber-t)"></div>
       </div>
       <div class="loading" id="loading"><div class="inner"><div class="spinner"></div><h2 id="loadTitle">Opening slide</h2><div id="loadMsg" class="note">Reading the TIFF header…</div></div></div>
     </main>
@@ -1504,7 +1505,7 @@ void main(void)\r
 <script>window.DEMO_GEARS = [{"_id": "demo-slide-cell-count", "category": "analysis", "gear": {"name": "slide-cell-count", "label": "Slide cell count (ROI)", "description": "Detects and counts nuclei inside a region of a pathology whole-slide image (SVS or pyramidal TIFF). H&E: haematoxylin nuclei. IHC: nuclei classed DAB-positive or negative. Deterministic colour deconvolution and peak detection, no model weights. Writes one GeoJSON of point detections and a summary (count, density per mm\u00b2, percent positive) to the analysis info. Launched from the Slide Review app, which passes the ROI.", "version": "0.1.0", "author": "Flywheel", "maintainer": "Flywheel <support@flywheel.io>", "license": "MIT", "source": "https://gitlab.com/flywheel-io/ (verify)", "url": "https://gitlab.com/flywheel-io/ (verify)", "cite": "Ruifrok AC, Johnston DA. Quantification of histochemical staining by color deconvolution. Anal Quant Cytol Histol. 2001;23(4):291-299.", "command": "python3 /flywheel/v0/run.py", "environment": {"FLYWHEEL": "/flywheel/v0", "PYTHONUNBUFFERED": "1"}, "inputs": {"slide": {"base": "file", "description": "Whole-slide image: Aperio SVS or tiled pyramidal TIFF with JPEG, LZW or Deflate tiles."}}, "config": {"roi": {"type": "string", "description": "Region of interest as JSON: {\"id\": \"...\", \"points\": [[x, y], ...]} in level-0 pixels. Set by Slide Review.", "default": ""}, "stain": {"type": "string", "enum": ["H&E", "IHC-DAB"], "default": "H&E", "description": "H&E counts nuclei. IHC-DAB also classes each nucleus DAB-positive or negative."}, "sigma_um": {"type": "number", "minimum": 0.3, "maximum": 6, "default": 1.0, "description": "Smoothing before thresholding, in micrometres."}, "min_distance_um": {"type": "number", "minimum": 1, "maximum": 30, "default": 2.5, "description": "Minimum distance between two nucleus centres, in micrometres."}, "min_radius_um": {"type": "number", "minimum": 0.3, "maximum": 15, "default": 1.2, "description": "Ignore blobs thinner than this radius, in micrometres (debris, edges)."}, "threshold": {"type": "number", "minimum": 0, "maximum": 3, "default": 0, "description": "Haematoxylin optical-density threshold. 0 = automatic (Otsu inside the ROI)."}, "dab_threshold": {"type": "number", "minimum": 0, "maximum": 2, "default": 0.15, "description": "DAB optical density above which a nucleus is Positive (IHC-DAB only)."}, "max_roi_mm2": {"type": "number", "minimum": 0.01, "maximum": 400, "default": 25, "description": "Refuse ROIs larger than this, in mm\u00b2."}, "mpp_override": {"type": "number", "minimum": 0, "maximum": 50, "default": 0, "description": "Micrometres per pixel at level 0 when the file has no calibration. 0 = read from the file."}}, "custom": {"gear-builder": {"category": "analysis", "image": "flywheel/slide-cell-count:0.1.0"}, "flywheel": {"suite": "Digital Pathology"}, "fw-apps": {"slide_review": {"task": "cell-count", "label": "Count cells", "input": "slide", "roi_config": "roi", "max_roi_config": "max_roi_mm2", "hidden_config": ["roi", "mpp_override", "max_roi_mm2"]}, "outputs": [{"name_pattern": "*.cells.*.geojson", "type": "geojson", "role": "primary", "render": "points", "info_paths": ["cell_count"]}]}}}}];</script>
 <script>
 'use strict';
-const APP = 'slide-review', VERSION = '0.2.0';
+const APP = 'slide-review', VERSION = '0.2.1';
 const $ = s => document.querySelector(s);
 const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 
@@ -1943,7 +1944,7 @@ function renderDiag() {
     <dt>Bytes read</dt><dd>${fmtBytes(S.bytes)}${S.file ? ` of ${fmtBytes(S.file.size)}` : ''}</dd>
     <dt>Tiles</dt><dd>${S.tiles} · avg ${avg} ms</dd>
     <dt>Decoder</dt><dd>${S.pool ? 'worker pool' : 'main thread'}</dd>
-    <dt>Range honoured</dt><dd>${S.mode === 'demo' ? 'n/a' : S.sourceKind === 'dicom' ? (DCM.rangeOK === true ? 'yes (zip member + range)' : DCM.rangeOK === false ? '<span style="color:var(--amber-t)">no: whole members downloaded</span>' : 'not tested yet') : S.rangeIgnored ? '<span style="color:var(--red-t)">no — whole file returned</span>' : 'yes'}</dd>
+    <dt>Range honoured</dt><dd>${S.mode === 'demo' ? 'n/a' : S.sourceKind === 'dicom' ? `yes, on the zip (${DCM.zipRanges || 0} range reads) · members ${esc(DCM.methods || '?')}` : S.rangeIgnored ? '<span style="color:var(--red-t)">no — whole file returned</span>' : 'yes'}</dd>
     ${S.sourceKind === 'dicom' ? `<dt>DICOM</dt><dd>${S.pages.map(p => `${esc(p.member)} · ${p.w}×${p.h} · ${esc(p.offsetSource)}`).join('<br>')}<br>frames cached ${DCM.cache.size}</dd>` : ''}
     <dt>Tools</dt><dd>${esc((S.availTools || []).join(', '))}</dd>
     <dt>Frame</dt><dd>${innerWidth}×${innerHeight} · doc ${document.documentElement.clientHeight} · app ${Math.round(document.querySelector('.app').getBoundingClientRect().height)} · dpr ${devicePixelRatio} · resizes ${S.resizes || 0}</dd>
@@ -2006,37 +2007,90 @@ const TS = {
 };
 const isZipDicom = f => /\.zip$/i.test(f.name || '') && (f.type === 'dicom' || /dicom|dcm/i.test(f.name || ''));
 
-class MemberReader {
-  constructor(file, m) { this.file = file; this.path = m.path; this.size = m.size; this.whole = null; this.loading = null; }
-  async loadWhole() {
-    if (this.whole) return this.whole;
-    if (this.size > 700e6) throw new Error(`${this.path} is ${fmtBytes(this.size)} and the host returned whole members, not ranges; too large to load in the browser.`);
-    this.loading = this.loading || timed('member', `${this.path} (whole, ${fmtBytes(this.size)})`, async () => {
-      const buf = await (await S.ext.getFileBlob(this.file, { member: this.path })).arrayBuffer();
-      S.bytes += buf.byteLength; this.whole = buf; return buf;
-    });
-    return this.loading;
+/* Zip access through byte ranges on the zip file itself (the host honours ranges on files, not on members).
+   Stored members are read by range directly. Deflated members are inflated progressively with the
+   browser's DecompressionStream, only as far as a read needs: headers cost one small request. */
+const ZIP_CHUNK = 4 * 1024 * 1024;
+async function zipRange(file, start, end) {
+  const t0 = performance.now();
+  const buf = await (await S.ext.getFileBlob(file, { range: `bytes=${start}-${end}` })).arrayBuffer();
+  if (buf.byteLength > end - start + 1) throw new Error('The host ignored a byte range on the zip file.');
+  S.bytes += buf.byteLength; DCM.zipRanges = (DCM.zipRanges || 0) + 1;
+  if (buf.byteLength > 1e6 || DCM.zipRanges < 6) logCall('zip', `bytes=${start}-${end} → ${fmtBytes(buf.byteLength)}`, true, performance.now() - t0);
+  return buf;
+}
+async function readZipIndex(file) {
+  const size = file.size, tailLen = Math.min(size, 66 * 1024);
+  const tail = await zipRange(file, size - tailLen, size - 1), tv = new DataView(tail);
+  let eocd = -1; for (let i = tail.byteLength - 22; i >= 0; i--) if (tv.getUint32(i, true) === 0x06054b50) { eocd = i; break; }
+  if (eocd < 0) throw new Error('Not a zip file (no end-of-central-directory record).');
+  let cdSize = tv.getUint32(eocd + 12, true), cdOff = tv.getUint32(eocd + 16, true), n = tv.getUint16(eocd + 10, true);
+  if (cdOff === 0xFFFFFFFF || n === 0xFFFF) { // ZIP64
+    const loc = eocd - 20; if (loc < 0 || tv.getUint32(loc, true) !== 0x07064b50) throw new Error('ZIP64 locator missing.');
+    const z64off = Number(tv.getBigUint64(loc + 8, true)); const z = new DataView(await zipRange(file, z64off, z64off + 55));
+    n = Number(z.getBigUint64(32, true)); cdSize = Number(z.getBigUint64(40, true)); cdOff = Number(z.getBigUint64(48, true));
   }
-  async read(start, end) { // end inclusive
-    end = Math.min(end, this.size - 1);
-    if (this.whole) return this.whole.slice(start, end + 1);
-    if (DCM.rangeOK === false) return (await this.loadWhole()).slice(start, end + 1);
-    const want = end - start + 1, t0 = performance.now();
-    let buf;
-    try { buf = await (await S.ext.getFileBlob(this.file, { member: this.path, range: `bytes=${start}-${end}` })).arrayBuffer(); }
-    catch (e) { logCall('member', `${this.path} bytes=${start}-${end}`, false, performance.now() - t0, String(e.message || e)); throw e; }
-    if (buf.byteLength === want || (buf.byteLength < want && buf.byteLength !== this.size)) {
-      DCM.rangeOK = true; S.bytes += buf.byteLength;
-      logCall('member', `${this.path} bytes=${start}-${end} → ${fmtBytes(buf.byteLength)}`, true, performance.now() - t0);
-      return buf;
+  const cd = await zipRange(file, cdOff, cdOff + cdSize - 1), v = new DataView(cd), dec = new TextDecoder(), entries = [];
+  for (let p = 0, i = 0; i < n && p + 46 <= cd.byteLength; i++) {
+    if (v.getUint32(p, true) !== 0x02014b50) break;
+    const method = v.getUint16(p + 10, true); let csize = v.getUint32(p + 20, true), usize = v.getUint32(p + 24, true), lho = v.getUint32(p + 42, true);
+    const nl = v.getUint16(p + 28, true), xl = v.getUint16(p + 30, true), cl = v.getUint16(p + 32, true);
+    const name = dec.decode(new Uint8Array(cd, p + 46, nl));
+    for (let q = p + 46 + nl; q + 4 <= p + 46 + nl + xl;) { // ZIP64 extra field
+      const id = v.getUint16(q, true), len = v.getUint16(q + 2, true); let r = q + 4;
+      if (id === 1) { if (usize === 0xFFFFFFFF) { usize = Number(v.getBigUint64(r, true)); r += 8; } if (csize === 0xFFFFFFFF) { csize = Number(v.getBigUint64(r, true)); r += 8; } if (lho === 0xFFFFFFFF) { lho = Number(v.getBigUint64(r, true)); } }
+      q += 4 + len;
     }
-    // the host ignored the range and sent the whole member: keep it and serve every later read from memory
-    if (DCM.rangeOK !== false) S.warnings.push('The host returned whole zip members instead of byte ranges, so each pyramid level is downloaded in full the first time it is needed.');
-    DCM.rangeOK = false; this.whole = buf; S.bytes += buf.byteLength;
-    logCall('member', `${this.path} range ignored → whole ${fmtBytes(buf.byteLength)}`, true, performance.now() - t0);
-    return buf.slice(start, end + 1);
+    entries.push({ path: name, method, csize, size: usize, lho });
+    p += 46 + nl + xl + cl;
+  }
+  return entries;
+}
+class ZipMember {
+  constructor(file, e) { Object.assign(this, { file, path: e.path, size: e.size, csize: e.csize, method: e.method, lho: e.lho }); this.out = null; this.outLen = 0; this.cpos = 0; this.pending = null; }
+  async dataStart() {
+    if (this.ds0 != null) return this.ds0;
+    const h = new DataView(await zipRange(this.file, this.lho, this.lho + 29));
+    if (h.getUint32(0, true) !== 0x04034b50) throw new Error(`${this.path}: bad local header`);
+    return (this.ds0 = this.lho + 30 + h.getUint16(26, true) + h.getUint16(28, true));
+  }
+  async read(start, end) { // end inclusive, uncompressed offsets
+    end = Math.min(end, this.size - 1);
+    if (this.method === 0) { const d = await this.dataStart(); return zipRange(this.file, d + start, d + end); }
+    if (this.method !== 8) throw new Error(`${this.path}: zip compression method ${this.method} is not supported`);
+    await this.ensure(end + 1);
+    return this.out.buffer.slice(start, end + 1);
+  }
+  async loadWhole() { if (this.method === 0) return this.read(0, this.size - 1); await this.ensure(this.size); return this.out.buffer; }
+  async ensure(n) {
+    if (this.outLen >= n) return;
+    if (!this.out) {
+      if (this.size > 1.5e9) throw new Error(`${this.path} is ${fmtBytes(this.size)}; too large to inflate in the browser.`);
+      this.out = new Uint8Array(this.size);
+      const ds = new DecompressionStream('deflate-raw'); this.writer = ds.writable.getWriter(); const reader = ds.readable.getReader();
+      this.drained = (async () => { for (;;) { const { value, done } = await reader.read(); if (done) break; const take = Math.min(value.length, this.size - this.outLen); this.out.set(value.subarray(0, take), this.outLen); this.outLen += take; } })();
+      this.drained.catch(e => { this.error = e; });
+    }
+    const big = n - this.outLen > 20e6;
+    if (big) DCM.busy = `Reading ${this.path.split('/').pop()} (${fmtBytes(this.size)})`, updateLoadHud();
+    try {
+      while (this.outLen < n) {
+        if (this.error) throw this.error;
+        if (this.cpos >= this.csize) { await this.drained; if (this.outLen < n) throw new Error(`${this.path}: ended early`); break; }
+        if (!this.pending) this.pending = (async () => {
+          const d = await this.dataStart(), c1 = Math.min(this.csize, this.cpos + (this.cpos === 0 ? 256 * 1024 : ZIP_CHUNK));
+          const chunk = await zipRange(this.file, d + this.cpos, d + c1 - 1); this.cpos = c1;
+          await this.writer.write(new Uint8Array(chunk));
+          if (this.cpos >= this.csize) await this.writer.close().catch(() => {});
+          await new Promise(r => setTimeout(r, 0)); // let the reader drain
+        })().finally(() => { this.pending = null; });
+        await this.pending;
+        if (big) { DCM.busyPct = Math.round(100 * this.outLen / this.size); updateLoadHud(); }
+      }
+    } finally { if (big) { DCM.busy = null; updateLoadHud(); } }
   }
 }
+function updateLoadHud() { const el = document.getElementById('hudLoad'); if (!el) return; el.hidden = !DCM.busy; if (DCM.busy) el.textContent = `${DCM.busy}${DCM.busyPct != null ? ` · ${DCM.busyPct}%` : ''}`; }
 
 async function readDicomHeader(r) {
   let n = Math.min(r.size, 64 * 1024), lastErr;
@@ -2134,14 +2188,15 @@ function jpegForBrowser(bytes, photometric) {
 }
 
 async function openDicomZip(file) {
-  const info = await timed('sdk', 'getArchiveMembers', () => S.ext.getArchiveMembers(file));
-  const members = (info.members || []).filter(m => m.size > 0 && !/\/$/.test(m.path) && !/DICOMDIR$/i.test(m.path));
+  const entries = await timed('zip', 'read central directory', () => readZipIndex(file));
+  const members = entries.filter(m => m.size > 0 && !/\/$/.test(m.path) && !/DICOMDIR$/i.test(m.path));
+  DCM.methods = [...new Set(members.map(m => m.method === 0 ? 'stored' : m.method === 8 ? 'deflate' : 'method ' + m.method))].join(', ');
   if (!members.length) throw new Error('The zip has no files in it.');
   const levels = [], others = [];
   // read headers in parallel, a few at a time
   const queue = members.slice(); const workers = Array.from({ length: Math.min(4, queue.length) }, async () => {
     while (queue.length) {
-      const m = queue.shift(), r = new MemberReader(file, m);
+      const m = queue.shift(), r = new ZipMember(file, m);
       try {
         const { ds, buf } = await readDicomHeader(r); const meta = wsiMeta(ds);
         if (meta.sop && meta.sop !== WSI_SOP) { others.push({ path: m.path, why: 'not a whole-slide image' }); continue; }
@@ -2660,7 +2715,7 @@ async function bootLive() {
   if (!AZ.canRun) AZ.why = 'You can’t run analyses on this container (needs the “run gears and create analyses” permission).';
   $('#eyebrow').textContent = [S.container.label ? (S.container.container_type || parent.type) + ' · ' + S.container.label : null, 'slide review'].filter(Boolean).join(' · ');
   if (isZipDicom(file)) {
-    S.dataPath = 'DICOM WSI in a zip · SDK getFileBlob({member, range}) · frames decoded by the browser';
+    S.dataPath = 'DICOM WSI in a zip · byte ranges on the zip, members inflated in the browser · frames decoded by the browser';
     setSource('blue', 'Live · Flywheel', S.dataPath);
     await startWithDicom(file);
   } else {
