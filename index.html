@@ -1494,12 +1494,17 @@ void main(void)\r
 
 
 </script>
+<script>/* dicom-parser 1.8.21 (MIT) */
+/*! dicom-parser - 1.8.12 - 2023-02-20 | (c) 2017 Chris Hafey | https://github.com/cornerstonejs/dicomParser */
+!function(e,t){"object"==typeof exports&&"object"==typeof module?module.exports=t(require("zlib")):"function"==typeof define&&define.amd?define("dicom-parser",["zlib"],t):"object"==typeof exports?exports["dicom-parser"]=t(require("zlib")):e.dicomParser=t(e.zlib)}(this,function(r){return a=[function(e,t){e.exports=r},function(e,t,s){"use strict";s.r(t),s.d(t,"isStringVr",function(){return d}),s.d(t,"isPrivateTag",function(){return f}),s.d(t,"parsePN",function(){return a}),s.d(t,"parseTM",function(){return n}),s.d(t,"parseDA",function(){return o}),s.d(t,"explicitElementToString",function(){return l}),s.d(t,"explicitDataSetToJS",function(){return u}),s.d(t,"createJPEGBasicOffsetTable",function(){return p}),s.d(t,"parseDicomDataSetExplicit",function(){return q}),s.d(t,"parseDicomDataSetImplicit",function(){return T}),s.d(t,"readFixedString",function(){return b}),s.d(t,"alloc",function(){return k}),s.d(t,"version",function(){return L}),s.d(t,"bigEndianByteArrayParser",function(){return N}),s.d(t,"ByteStream",function(){return J}),s.d(t,"sharedCopy",function(){return j}),s.d(t,"DataSet",function(){return w}),s.d(t,"findAndSetUNElementLength",function(){return y}),s.d(t,"findEndOfEncapsulatedElement",function(){return g}),s.d(t,"findItemDelimitationItemAndSetElementLength",function(){return x}),s.d(t,"littleEndianByteArrayParser",function(){return M}),s.d(t,"parseDicom",function(){return V}),s.d(t,"readDicomElementExplicit",function(){return B}),s.d(t,"readDicomElementImplicit",function(){return A}),s.d(t,"readEncapsulatedImageFrame",function(){return W}),s.d(t,"readEncapsulatedPixelData",function(){return K}),s.d(t,"readEncapsulatedPixelDataFromFragments",function(){return _}),s.d(t,"readPart10Header",function(){return G}),s.d(t,"readSequenceItemsExplicit",function(){return I}),s.d(t,"readSequenceItemsImplicit",function(){return F}),s.d(t,"readSequenceItem",function(){return S}),s.d(t,"readTag",function(){return h});var r={AE:!0,AS:!0,AT:!1,CS:!0,DA:!0,DS:!0,DT:!0,FL:!1,FD:!1,IS:!0,LO:!0,LT:!0,OB:!1,OD:!1,OF:!1,OW:!1,PN:!0,SH:!0,SL:!1,SQ:!1,SS:!1,ST:!0,TM:!0,UI:!0,UL:!1,UN:void 0,UR:!0,US:!1,UT:!0},d=function(e){return r[e]},f=function(e){e=parseInt(e[4],16);if(isNaN(e))throw"dicomParser.isPrivateTag: cannot parse last character of group";return e%2==1},a=function(e){if(void 0!==e){e=e.split("^");return{familyName:e[0],givenName:e[1],middleName:e[2],prefix:e[3],suffix:e[4]}}};function n(e,t){if(2<=e.length){var r=parseInt(e.substring(0,2),10),a=4<=e.length?parseInt(e.substring(2,4),10):void 0,n=6<=e.length?parseInt(e.substring(4,6),10):void 0,i=8<=e.length?e.substring(7,13):void 0,i=i?parseInt(i,10)*Math.pow(10,6-i.length):void 0;if(t&&(isNaN(r)||void 0!==a&&isNaN(a)||void 0!==n&&isNaN(n)||void 0!==i&&isNaN(i)||r<0||23<r||a&&(a<0||59<a)||n&&(n<0||59<n)||i&&(i<0||999999<i)))throw"invalid TM '".concat(e,"'");return{hours:r,minutes:a,seconds:n,fractionalSeconds:i}}if(t)throw"invalid TM '".concat(e,"'")}function i(e,t,r){return!isNaN(r)&&(0<t&&t<=12&&0<e&&e<=function(e,t){switch(e){case 2:return t%4==0&&t%100||t%400==0?29:28;case 9:case 4:case 6:case 11:return 30;default:return 31}}(t,r))}function o(e,t){if(e&&8===e.length){var r=parseInt(e.substring(0,4),10),a=parseInt(e.substring(4,6),10),n=parseInt(e.substring(6,8),10);if(t&&!0!==i(n,a,r))throw"invalid DA '".concat(e,"'");return{year:r,month:a,day:n}}if(t)throw"invalid DA '".concat(e,"'")}function l(n,e){if(void 0===n||void 0===e)throw"dicomParser.explicitElementToString: missing required parameters";if(void 0===e.vr)throw"dicomParser.explicitElementToString: cannot convert implicit element to string";var t,r=e.vr,i=e.tag;function a(e,t){for(var r="",a=0;a<e;a++)0!==a&&(r+="/"),r+=t.call(n,i,a).toString();return r}if(!0===d(r))t=n.string(i);else{if("AT"===r){var o=n.uint32(i);return void 0===o?void 0:"x".concat((o=o<0?4294967295+o+1:o).toString(16).toUpperCase())}"US"===r?t=a(e.length/2,n.uint16):"SS"===r?t=a(e.length/2,n.int16):"UL"===r?t=a(e.length/4,n.uint32):"SL"===r?t=a(e.length/4,n.int32):"FD"===r?t=a(e.length/8,n.double):"FL"===r&&(t=a(e.length/4,n.float))}return t}function u(e,t){if(void 0===e)throw"dicomParser.explicitDataSetToJS: missing required parameter dataSet";t=t||{omitPrivateAttibutes:!0,maxElementLength:128};var r,a={};for(r in e.elements){var n=e.elements[r];if(!0!==t.omitPrivateAttibutes||!f(r))if(n.items){for(var i=[],o=0;o<n.items.length;o++)i.push(u(n.items[o].dataSet,t));a[r]=i}else{var s=void 0;n.length<t.maxElementLength&&(s=l(e,n)),a[r]=void 0!==s?s:{dataOffset:n.dataOffset,length:n.length}}}return a}function c(e,t){return 255===e.byteArray[t]&&217===e.byteArray[t+1]}function m(e,t,r){for(var a,n,i=r;i<t.fragments.length;i++)if(a=e,n=i,n=t.fragments[n],!(!c(a,n.position+n.length-2)&&!c(a,n.position+n.length-3)))return i}function p(e,t,r){if(void 0===e)throw"dicomParser.createJPEGBasicOffsetTable: missing required parameter dataSet";if(void 0===t)throw"dicomParser.createJPEGBasicOffsetTable: missing required parameter pixelDataElement";if("x7fe00010"!==t.tag)throw"dicomParser.createJPEGBasicOffsetTable: parameter 'pixelDataElement' refers to non pixel data tag (expected tag = x7fe00010'";if(!0!==t.encapsulatedPixelData)throw"dicomParser.createJPEGBasicOffsetTable: parameter 'pixelDataElement' refers to pixel data element that does not have encapsulated pixel data";if(!0!==t.hadUndefinedLength)throw"dicomParser.createJPEGBasicOffsetTable: parameter 'pixelDataElement' refers to pixel data element that does not have encapsulated pixel data";if(void 0===t.basicOffsetTable)throw"dicomParser.createJPEGBasicOffsetTable: parameter 'pixelDataElement' refers to pixel data element that does not have encapsulated pixel data";if(void 0===t.fragments)throw"dicomParser.createJPEGBasicOffsetTable: parameter 'pixelDataElement' refers to pixel data element that does not have encapsulated pixel data";if(t.fragments.length<=0)throw"dicomParser.createJPEGBasicOffsetTable: parameter 'pixelDataElement' refers to pixel data element that does not have encapsulated pixel data";if(r&&r.length<=0)throw"dicomParser.createJPEGBasicOffsetTable: parameter 'fragments' must not be zero length";r=r||t.fragments;for(var a=[],n=0;;){a.push(t.fragments[n].offset);var i=m(e,t,n);if(void 0===i||i===t.fragments.length-1)return a;n=i+1}}function h(e){if(void 0===e)throw"dicomParser.readTag: missing required parameter 'byteStream'";var t=256*e.readUint16()*256,e=e.readUint16();return"x".concat("00000000".concat((t+e).toString(16)).substr(-8))}function g(e,t,r){if(void 0===e)throw"dicomParser.findEndOfEncapsulatedElement: missing required parameter 'byteStream'";if(void 0===t)throw"dicomParser.findEndOfEncapsulatedElement: missing required parameter 'element'";if(t.encapsulatedPixelData=!0,t.basicOffsetTable=[],t.fragments=[],"xfffee000"!==h(e))throw"dicomParser.findEndOfEncapsulatedElement: basic offset table not found";for(var a=e.readUint32()/4,n=0;n<a;n++){var i=e.readUint32();t.basicOffsetTable.push(i)}for(var o=e.position;e.position<e.byteArray.length;){var s=h(e),d=e.readUint32();if("xfffee0dd"===s)return e.seek(d),void(t.length=e.position-t.dataOffset);if("xfffee000"!==s)return r&&r.push("unexpected tag ".concat(s," while searching for end of pixel data element with undefined length")),d>e.byteArray.length-e.position&&(d=e.byteArray.length-e.position),t.fragments.push({offset:e.position-o-8,position:e.position,length:d}),e.seek(d),void(t.length=e.position-t.dataOffset);t.fragments.push({offset:e.position-o-8,position:e.position,length:d}),e.seek(d)}r&&r.push("pixel data element ".concat(t.tag," missing sequence delimiter tag xfffee0dd"))}function y(e,t){if(void 0===e)throw"dicomParser.findAndSetUNElementLength: missing required parameter 'byteStream'";for(var r=e.byteArray.length-8;e.position<=r;)if(65534===e.readUint16()){var a=e.readUint16();if(57565===a)return 0!==e.readUint32()&&e.warnings("encountered non zero length following item delimiter at position ".concat(e.position-4," while reading element of undefined length with tag ").concat(t.tag)),void(t.length=e.position-t.dataOffset)}t.length=e.byteArray.length-t.dataOffset,e.seek(e.byteArray.length-e.position)}function b(e,t,r){if(r<0)throw"dicomParser.readFixedString - length cannot be less than 0";if(t+r>e.length)throw"dicomParser.readFixedString: attempt to read past end of buffer";for(var a,n="",i=0;i<r;i++){if(0===(a=e[t+i]))return t+=r,n;n+=String.fromCharCode(a)}return n}function v(e,t){for(var r=0;r<t.length;r++){var a=t[r];a.enumerable=a.enumerable||!1,a.configurable=!0,"value"in a&&(a.writable=!0),Object.defineProperty(e,a.key,a)}}function P(e,t){return void 0!==e.parser?e.parser:t}var w=function(){function a(e,t,r){!function(e,t){if(!(e instanceof t))throw new TypeError("Cannot call a class as a function")}(this,a),this.byteArrayParser=e,this.byteArray=t,this.elements=r}var e,t,r;return e=a,(t=[{key:"uint16",value:function(e,t){e=this.elements[e];if(t=void 0!==t?t:0,e&&0!==e.length)return P(e,this.byteArrayParser).readUint16(this.byteArray,e.dataOffset+2*t)}},{key:"int16",value:function(e,t){e=this.elements[e];if(t=void 0!==t?t:0,e&&0!==e.length)return P(e,this.byteArrayParser).readInt16(this.byteArray,e.dataOffset+2*t)}},{key:"uint32",value:function(e,t){e=this.elements[e];if(t=void 0!==t?t:0,e&&0!==e.length)return P(e,this.byteArrayParser).readUint32(this.byteArray,e.dataOffset+4*t)}},{key:"int32",value:function(e,t){e=this.elements[e];if(t=void 0!==t?t:0,e&&0!==e.length)return P(e,this.byteArrayParser).readInt32(this.byteArray,e.dataOffset+4*t)}},{key:"float",value:function(e,t){e=this.elements[e];if(t=void 0!==t?t:0,e&&0!==e.length)return P(e,this.byteArrayParser).readFloat(this.byteArray,e.dataOffset+4*t)}},{key:"double",value:function(e,t){e=this.elements[e];if(t=void 0!==t?t:0,e&&0!==e.length)return P(e,this.byteArrayParser).readDouble(this.byteArray,e.dataOffset+8*t)}},{key:"numStringValues",value:function(e){e=this.elements[e];if(e&&0<e.length){e=b(this.byteArray,e.dataOffset,e.length).match(/\\/g);return null===e?1:e.length+1}}},{key:"string",value:function(e,t){e=this.elements[e];if(e&&e.Value)return e.Value;if(e&&0<e.length){e=b(this.byteArray,e.dataOffset,e.length);return 0<=t?e.split("\\")[t].trim():e.trim()}}},{key:"text",value:function(e,t){e=this.elements[e];if(e&&0<e.length){e=b(this.byteArray,e.dataOffset,e.length);return 0<=t?e.split("\\")[t].replace(/ +$/,""):e.replace(/ +$/,"")}}},{key:"floatString",value:function(e,t){var r=this.elements[e];if(r&&0<r.length){t=this.string(e,t=void 0!==t?t:0);if(void 0!==t)return parseFloat(t)}}},{key:"intString",value:function(e,t){var r=this.elements[e];if(r&&0<r.length){t=this.string(e,t=void 0!==t?t:0);if(void 0!==t)return parseInt(t)}}},{key:"attributeTag",value:function(e){var t=this.elements[e];if(t&&4===t.length){var r=P(t,this.byteArrayParser).readUint16,e=this.byteArray,t=t.dataOffset;return"x".concat("00000000".concat((256*r(e,t)*256+r(e,t+2)).toString(16)).substr(-8))}}}])&&v(e.prototype,t),r&&v(e,r),Object.defineProperty(e,"prototype",{writable:!1}),a}();function x(e,t){if(void 0===e)throw"dicomParser.readDicomElementImplicit: missing required parameter 'byteStream'";for(var r=e.byteArray.length-8;e.position<=r;)if(65534===e.readUint16()){var a=e.readUint16();if(57357===a)return 0!==e.readUint32()&&e.warnings("encountered non zero length following item delimiter at position ".concat(e.position-4," while reading element of undefined length with tag ").concat(t.tag)),void(t.length=e.position-t.dataOffset)}t.length=e.byteArray.length-t.dataOffset,e.seek(e.byteArray.length-e.position)}var E=function(e,t){if(void 0!==e.vr)return"SQ"===e.vr;if(t.position+4<=t.byteArray.length){e=h(t);return t.seek(-4),"xfffee000"===e||"xfffee0dd"===e}return t.warnings.push("eof encountered before finding sequence item tag or sequence delimiter tag in peeking to determine VR"),!1};function A(e,t,r){if(void 0===e)throw"dicomParser.readDicomElementImplicit: missing required parameter 'byteStream'";var a=h(e),a={tag:a,vr:void 0!==r?r(a):void 0,length:e.readUint32(),dataOffset:e.position};return 4294967295===a.length&&(a.hadUndefinedLength=!0),a.tag===t||(!E(a,e)||f(a.tag)&&!a.hadUndefinedLength?a.hadUndefinedLength?x(e,a):e.seek(a.length):(F(e,a,r),f(a.tag)&&(a.items=void 0))),a}function S(e){if(void 0===e)throw"dicomParser.readSequenceItem: missing required parameter 'byteStream'";var t={tag:h(e),length:e.readUint32(),dataOffset:e.position};if("xfffee000"!==t.tag)throw"dicomParser.readSequenceItem: item tag (FFFE,E000) not found at offset ".concat(e.position);return t}function D(e,t){var r=S(e);return 4294967295===r.length?(r.hadUndefinedLength=!0,r.dataSet=function(e,t){for(var r={};e.position<e.byteArray.length;){var a=A(e,void 0,t);if("xfffee00d"===(r[a.tag]=a).tag)return new w(e.byteArrayParser,e.byteArray,r)}return e.warnings.push("eof encountered before finding sequence item delimiter in sequence item of undefined length"),new w(e.byteArrayParser,e.byteArray,r)}(e,t),r.length=e.position-r.dataOffset):(r.dataSet=new w(e.byteArrayParser,e.byteArray,{}),T(r.dataSet,e,e.position+r.length,{vrCallback:t})),r}function F(e,t,r){if(void 0===e)throw"dicomParser.readSequenceItemsImplicit: missing required parameter 'byteStream'";if(void 0===t)throw"dicomParser.readSequenceItemsImplicit: missing required parameter 'element'";t.items=[],(4294967295===t.length?function(e,t,r){for(;e.position+4<=e.byteArray.length;){var a=h(e);if(e.seek(-4),"xfffee0dd"===a)return t.length=e.position-t.dataOffset,e.seek(8);a=D(e,r);t.items.push(a)}e.warnings.push("eof encountered before finding sequence delimiter in sequence of undefined length"),t.length=e.byteArray.length-t.dataOffset}:function(e,t,r){for(var a=t.dataOffset+t.length;e.position<a;){var n=D(e,r);t.items.push(n)}})(e,t,r)}function O(e,t){var r=S(e);return 4294967295===r.length?(r.hadUndefinedLength=!0,r.dataSet=function(e,t){for(var r={};e.position<e.byteArray.length;){var a=B(e,t);if("xfffee00d"===(r[a.tag]=a).tag)return new w(e.byteArrayParser,e.byteArray,r)}return t.push("eof encountered before finding item delimiter tag while reading sequence item of undefined length"),new w(e.byteArrayParser,e.byteArray,r)}(e,t),r.length=e.position-r.dataOffset):(r.dataSet=new w(e.byteArrayParser,e.byteArray,{}),q(r.dataSet,e,e.position+r.length)),r}function I(e,t,r){if(void 0===e)throw"dicomParser.readSequenceItemsExplicit: missing required parameter 'byteStream'";if(void 0===t)throw"dicomParser.readSequenceItemsExplicit: missing required parameter 'element'";t.items=[],(4294967295===t.length?function(e,t,r){for(;e.position+4<=e.byteArray.length;){var a=h(e);if(e.seek(-4),"xfffee0dd"===a)return t.length=e.position-t.dataOffset,e.seek(8);a=O(e,r);t.items.push(a)}r.push("eof encountered before finding sequence delimitation tag while reading sequence of undefined length"),t.length=e.position-t.dataOffset}:function(e,t,r){for(var a=t.dataOffset+t.length;e.position<a;){var n=O(e,r);t.items.push(n)}})(e,t,r)}var U=function(e){return"OB"===e||"OD"===e||"OL"===e||"OW"===e||"SQ"===e||"OF"===e||"UC"===e||"UR"===e||"UT"===e||"UN"===e?4:2};function B(e,t,r){if(void 0===e)throw"dicomParser.readDicomElementExplicit: missing required parameter 'byteStream'";var a={tag:h(e),vr:e.readFixedString(2)};return 2===U(a.vr)?a.length=e.readUint16():(e.seek(2),a.length=e.readUint32()),a.dataOffset=e.position,4294967295===a.length&&(a.hadUndefinedLength=!0),a.tag===r||("SQ"===a.vr?I(e,a,t):4294967295===a.length?"x7fe00010"===a.tag?g(e,a,t):("UN"===a.vr?F:x)(e,a):e.seek(a.length)),a}function q(e,t,r){var a=3<arguments.length&&void 0!==arguments[3]?arguments[3]:{};if(r=void 0===r?t.byteArray.length:r,void 0===t)throw"dicomParser.parseDicomDataSetExplicit: missing required parameter 'byteStream'";if(r<t.position||r>t.byteArray.length)throw"dicomParser.parseDicomDataSetExplicit: invalid value for parameter 'maxP osition'";for(var n=e.elements;t.position<r;){var i=B(t,e.warnings,a.untilTag);if((n[i.tag]=i).tag===a.untilTag)return}if(t.position>r)throw"dicomParser:parseDicomDataSetExplicit: buffer overrun"}function T(e,t,r){var a=3<arguments.length&&void 0!==arguments[3]?arguments[3]:{};if(r=void 0===r?e.byteArray.length:r,void 0===t)throw"dicomParser.parseDicomDataSetImplicit: missing required parameter 'byteStream'";if(r<t.position||r>t.byteArray.length)throw"dicomParser.parseDicomDataSetImplicit: invalid value for parameter 'maxPosition'";for(var n=e.elements;t.position<r;){var i=A(t,a.untilTag,a.vrCallback);if((n[i.tag]=i).tag===a.untilTag)return}}function k(e,t){if("undefined"!=typeof Buffer&&e instanceof Buffer)return Buffer.alloc(t);if(e instanceof Uint8Array)return new Uint8Array(t);throw"dicomParser.alloc: unknown type for byteArray"}var L="1.8.12",N={readUint16:function(e,t){if(t<0)throw"bigEndianByteArrayParser.readUint16: position cannot be less than 0";if(t+2>e.length)throw"bigEndianByteArrayParser.readUint16: attempt to read past end of buffer";return(e[t]<<8)+e[t+1]},readInt16:function(e,t){if(t<0)throw"bigEndianByteArrayParser.readInt16: position cannot be less than 0";if(t+2>e.length)throw"bigEndianByteArrayParser.readInt16: attempt to read past end of buffer";t=(e[t]<<8)+e[t+1];return t=32768&t?t-65535-1:t},readUint32:function(e,t){if(t<0)throw"bigEndianByteArrayParser.readUint32: position cannot be less than 0";if(t+4>e.length)throw"bigEndianByteArrayParser.readUint32: attempt to read past end of buffer";return 256*(256*(256*e[t]+e[t+1])+e[t+2])+e[t+3]},readInt32:function(e,t){if(t<0)throw"bigEndianByteArrayParser.readInt32: position cannot be less than 0";if(t+4>e.length)throw"bigEndianByteArrayParser.readInt32: attempt to read past end of buffer";return(e[t]<<24)+(e[t+1]<<16)+(e[t+2]<<8)+e[t+3]},readFloat:function(e,t){if(t<0)throw"bigEndianByteArrayParser.readFloat: position cannot be less than 0";if(t+4>e.length)throw"bigEndianByteArrayParser.readFloat: attempt to read past end of buffer";var r=new Uint8Array(4);return r[3]=e[t],r[2]=e[t+1],r[1]=e[t+2],r[0]=e[t+3],new Float32Array(r.buffer)[0]},readDouble:function(e,t){if(t<0)throw"bigEndianByteArrayParser.readDouble: position cannot be less than 0";if(t+8>e.length)throw"bigEndianByteArrayParser.readDouble: attempt to read past end of buffer";var r=new Uint8Array(8);return r[7]=e[t],r[6]=e[t+1],r[5]=e[t+2],r[4]=e[t+3],r[3]=e[t+4],r[2]=e[t+5],r[1]=e[t+6],r[0]=e[t+7],new Float64Array(r.buffer)[0]}};function j(e,t,r){if("undefined"!=typeof Buffer&&e instanceof Buffer)return e.slice(t,t+r);if(e instanceof Uint8Array)return new Uint8Array(e.buffer,e.byteOffset+t,r);throw"dicomParser.from: unknown type for byteArray"}function C(e,t){for(var r=0;r<t.length;r++){var a=t[r];a.enumerable=a.enumerable||!1,a.configurable=!0,"value"in a&&(a.writable=!0),Object.defineProperty(e,a.key,a)}}var J=function(){function a(e,t,r){if(!function(e,t){if(!(e instanceof t))throw new TypeError("Cannot call a class as a function")}(this,a),void 0===e)throw"dicomParser.ByteStream: missing required parameter 'byteArrayParser'";if(void 0===t)throw"dicomParser.ByteStream: missing required parameter 'byteArray'";if(t instanceof Uint8Array==!1&&("undefined"==typeof Buffer||t instanceof Buffer==!1))throw"dicomParser.ByteStream: parameter byteArray is not of type Uint8Array or Buffer";if(r<0)throw"dicomParser.ByteStream: parameter 'position' cannot be less than 0";if(r>=t.length)throw"dicomParser.ByteStream: parameter 'position' cannot be greater than or equal to 'byteArray' length";this.byteArrayParser=e,this.byteArray=t,this.position=r||0,this.warnings=[]}var e,t,r;return e=a,(t=[{key:"seek",value:function(e){if(this.position+e<0)throw"dicomParser.ByteStream.prototype.seek: cannot seek to position < 0";this.position+=e}},{key:"readByteStream",value:function(e){if(this.position+e>this.byteArray.length)throw"dicomParser.ByteStream.prototype.readByteStream: readByteStream - buffer overread";var t=j(this.byteArray,this.position,e);return this.position+=e,new a(this.byteArrayParser,t)}},{key:"getSize",value:function(){return this.byteArray.length}},{key:"readUint16",value:function(){var e=this.byteArrayParser.readUint16(this.byteArray,this.position);return this.position+=2,e}},{key:"readUint32",value:function(){var e=this.byteArrayParser.readUint32(this.byteArray,this.position);return this.position+=4,e}},{key:"readFixedString",value:function(e){var t=b(this.byteArray,this.position,e);return this.position+=e,t}}])&&C(e.prototype,t),r&&C(e,r),Object.defineProperty(e,"prototype",{writable:!1}),a}(),M={readUint16:function(e,t){if(t<0)throw"littleEndianByteArrayParser.readUint16: position cannot be less than 0";if(t+2>e.length)throw"littleEndianByteArrayParser.readUint16: attempt to read past end of buffer";return e[t]+256*e[t+1]},readInt16:function(e,t){if(t<0)throw"littleEndianByteArrayParser.readInt16: position cannot be less than 0";if(t+2>e.length)throw"littleEndianByteArrayParser.readInt16: attempt to read past end of buffer";t=e[t]+(e[t+1]<<8);return t=32768&t?t-65535-1:t},readUint32:function(e,t){if(t<0)throw"littleEndianByteArrayParser.readUint32: position cannot be less than 0";if(t+4>e.length)throw"littleEndianByteArrayParser.readUint32: attempt to read past end of buffer";return e[t]+256*e[t+1]+256*e[t+2]*256+256*e[t+3]*256*256},readInt32:function(e,t){if(t<0)throw"littleEndianByteArrayParser.readInt32: position cannot be less than 0";if(t+4>e.length)throw"littleEndianByteArrayParser.readInt32: attempt to read past end of buffer";return e[t]+(e[t+1]<<8)+(e[t+2]<<16)+(e[t+3]<<24)},readFloat:function(e,t){if(t<0)throw"littleEndianByteArrayParser.readFloat: position cannot be less than 0";if(t+4>e.length)throw"littleEndianByteArrayParser.readFloat: attempt to read past end of buffer";var r=new Uint8Array(4);return r[0]=e[t],r[1]=e[t+1],r[2]=e[t+2],r[3]=e[t+3],new Float32Array(r.buffer)[0]},readDouble:function(e,t){if(t<0)throw"littleEndianByteArrayParser.readDouble: position cannot be less than 0";if(t+8>e.length)throw"littleEndianByteArrayParser.readDouble: attempt to read past end of buffer";var r=new Uint8Array(8);return r[0]=e[t],r[1]=e[t+1],r[2]=e[t+2],r[3]=e[t+3],r[4]=e[t+4],r[5]=e[t+5],r[6]=e[t+6],r[7]=e[t+7],new Float64Array(r.buffer)[0]}};function G(e){var i=1<arguments.length&&void 0!==arguments[1]?arguments[1]:{};if(void 0===e)throw"dicomParser.readPart10Header: missing required parameter 'byteArray'";var o=i.TransferSyntaxUID,s=new J(M,e);return function(){var e=function(){if(s.getSize()<=132&&o)return!1;if(s.seek(128),"DICM"===s.readFixedString(4))return!0;if(!(i||{}).TransferSyntaxUID)throw"dicomParser.readPart10Header: DICM prefix not found at location 132 - this is not a valid DICOM P10 file.";return s.seek(0),!1}(),t=[],r={};if(!e)return s.position=0,{elements:{x00020010:{tag:"x00020010",vr:"UI",Value:o}},warnings:t};for(;s.position<s.byteArray.length;){var a=s.position,n=B(s,t);if("x0002ffff"<n.tag){s.position=a;break}n.parser=M,r[n.tag]=n}return(e=new w(s.byteArrayParser,s.byteArray,r)).warnings=s.warnings,e.position=s.position,e}()}var z="1.2.840.10008.1.2.2";function V(i){var o=1<arguments.length&&void 0!==arguments[1]?arguments[1]:{};if(void 0===i)throw new Error("dicomParser.parseDicom: missing required parameter 'byteArray'");var e,a=function(e){if(void 0===e.elements.x00020010)throw new Error("dicomParser.parseDicom: missing required meta header attribute 0002,0010");e=e.elements.x00020010;return e&&e.Value||b(i,e.dataOffset,e.length)};function t(t){var e=a(t),r="1.2.840.10008.1.2"!==e,e=function(e,t){var r="[object process]"===Object.prototype.toString.call("undefined"!=typeof process?process:0);if("1.2.840.10008.1.2.1.99"!==e)return new J(e===z?N:M,i,t);if(o&&o.inflater){e=o.inflater(i,t);return new J(M,e,0)}if(!0==r){var a=s(0),n=j(i,t,i.length-t),a=a.inflateRawSync(n),n=k(i,a.length+t);return i.copy(n,0,0,t),a.copy(n,t),new J(M,n,0)}if("undefined"==typeof pako)throw"dicomParser.parseDicom: no inflater available to handle deflate transfer syntax";return a=i.slice(t),n=pako.inflateRaw(a),(a=k(i,n.length+t)).set(i.slice(0,t),0),a.set(n,t),new J(M,a,0)}(e,t.position),t=new w(e.byteArrayParser,e.byteArray,{});t.warnings=e.warnings;try{(r?q:T)(t,e,e.byteArray.length,o)}catch(e){throw{exception:e,dataSet:t}}return t}return function(e,t){for(var r in e.elements)e.elements.hasOwnProperty(r)&&(t.elements[r]=e.elements[r]);return void 0!==e.warnings&&(t.warnings=e.warnings.concat(t.warnings)),t}(e=G(i,o),t(e))}var R=function(e,t,r){for(var a=0,n=t;n<t+r;n++)a+=e[n].length;return a};function _(e,t,r,a,n){if(n=n||t.fragments,void 0===e)throw"dicomParser.readEncapsulatedPixelDataFromFragments: missing required parameter 'dataSet'";if(void 0===t)throw"dicomParser.readEncapsulatedPixelDataFromFragments: missing required parameter 'pixelDataElement'";if(void 0===r)throw"dicomParser.readEncapsulatedPixelDataFromFragments: missing required parameter 'startFragmentIndex'";if(void 0===(a=a||1))throw"dicomParser.readEncapsulatedPixelDataFromFragments: missing required parameter 'numFragments'";if("x7fe00010"!==t.tag)throw"dicomParser.readEncapsulatedPixelDataFromFragments: parameter 'pixelDataElement' refers to non pixel data tag (expected tag = x7fe00010";if(!0!==t.encapsulatedPixelData)throw"dicomParser.readEncapsulatedPixelDataFromFragments: parameter 'pixelDataElement' refers to pixel data element that does not have encapsulated pixel data";if(!0!==t.hadUndefinedLength)throw"dicomParser.readEncapsulatedPixelDataFromFragments: parameter 'pixelDataElement' refers to pixel data element that does not have encapsulated pixel data";if(void 0===t.basicOffsetTable)throw"dicomParser.readEncapsulatedPixelDataFromFragments: parameter 'pixelDataElement' refers to pixel data element that does not have encapsulated pixel data";if(void 0===t.fragments)throw"dicomParser.readEncapsulatedPixelDataFromFragments: parameter 'pixelDataElement' refers to pixel data element that does not have encapsulated pixel data";if(t.fragments.length<=0)throw"dicomParser.readEncapsulatedPixelDataFromFragments: parameter 'pixelDataElement' refers to pixel data element that does not have encapsulated pixel data";if(r<0)throw"dicomParser.readEncapsulatedPixelDataFromFragments: parameter 'startFragmentIndex' must be >= 0";if(r>=t.fragments.length)throw"dicomParser.readEncapsulatedPixelDataFromFragments: parameter 'startFragmentIndex' must be < number of fragments";if(a<1)throw"dicomParser.readEncapsulatedPixelDataFromFragments: parameter 'numFragments' must be > 0";if(r+a>t.fragments.length)throw"dicomParser.readEncapsulatedPixelDataFromFragments: parameter 'startFragment' + 'numFragments' < number of fragments";var i=new J(e.byteArrayParser,e.byteArray,t.dataOffset),t=S(i);if("xfffee000"!==t.tag)throw"dicomParser.readEncapsulatedPixelData: missing basic offset table xfffee000";i.seek(t.length);var o=i.position;if(1===a)return j(i.byteArray,o+n[r].offset+8,n[r].length);for(var t=R(n,r,a),s=k(i.byteArray,t),d=0,f=r;f<r+a;f++)for(var l=o+n[f].offset+8,u=0;u<n[f].length;u++)s[d++]=i.byteArray[l++];return s}var H=function(e,t){for(var r=0;r<e.length;r++)if(e[r].offset===t)return r},Q=function(e,t,r,a){if(e===t.length-1)return r.length-a;for(var n=t[e+1],i=a+1;i<r.length;i++)if(r[i].offset===n)return i-a;throw"dicomParser.calculateNumberOfFragmentsForFrame: could not find fragment with offset matching basic offset table"};function W(e,t,r,a,n){if(a=a||t.basicOffsetTable,n=n||t.fragments,void 0===e)throw"dicomParser.readEncapsulatedImageFrame: missing required parameter 'dataSet'";if(void 0===t)throw"dicomParser.readEncapsulatedImageFrame: missing required parameter 'pixelDataElement'";if(void 0===r)throw"dicomParser.readEncapsulatedImageFrame: missing required parameter 'frameIndex'";if(void 0===a)throw"dicomParser.readEncapsulatedImageFrame: parameter 'pixelDataElement' does not have basicOffsetTable";if("x7fe00010"!==t.tag)throw"dicomParser.readEncapsulatedImageFrame: parameter 'pixelDataElement' refers to non pixel data tag (expected tag = x7fe00010)";if(!0!==t.encapsulatedPixelData)throw"dicomParser.readEncapsulatedImageFrame: parameter 'pixelDataElement' refers to pixel data element that does not have encapsulated pixel data";if(!0!==t.hadUndefinedLength)throw"dicomParser.readEncapsulatedImageFrame: parameter 'pixelDataElement' refers to pixel data element that does not have undefined length";if(void 0===t.fragments)throw"dicomParser.readEncapsulatedImageFrame: parameter 'pixelDataElement' refers to pixel data element that does not have fragments";if(0===a.length)throw"dicomParser.readEncapsulatedImageFrame: basicOffsetTable has zero entries";if(r<0)throw"dicomParser.readEncapsulatedImageFrame: parameter 'frameIndex' must be >= 0";if(r>=a.length)throw"dicomParser.readEncapsulatedImageFrame: parameter 'frameIndex' must be < basicOffsetTable.length";var i=a[r],i=H(n,i);if(void 0===i)throw"dicomParser.readEncapsulatedImageFrame: unable to find fragment that matches basic offset table entry";return _(e,t,i,Q(r,a,n,i),n)}var $=!1;function K(e,t,r){if($||($=!0,console&&console.log&&console.log("WARNING: dicomParser.readEncapsulatedPixelData() has been deprecated")),void 0===e)throw"dicomParser.readEncapsulatedPixelData: missing required parameter 'dataSet'";if(void 0===t)throw"dicomParser.readEncapsulatedPixelData: missing required parameter 'element'";if(void 0===r)throw"dicomParser.readEncapsulatedPixelData: missing required parameter 'frame'";if("x7fe00010"!==t.tag)throw"dicomParser.readEncapsulatedPixelData: parameter 'element' refers to non pixel data tag (expected tag = x7fe00010)";if(!0!==t.encapsulatedPixelData)throw"dicomParser.readEncapsulatedPixelData: parameter 'element' refers to pixel data element that does not have encapsulated pixel data";if(!0!==t.hadUndefinedLength)throw"dicomParser.readEncapsulatedPixelData: parameter 'element' refers to pixel data element that does not have encapsulated pixel data";if(void 0===t.basicOffsetTable)throw"dicomParser.readEncapsulatedPixelData: parameter 'element' refers to pixel data element that does not have encapsulated pixel data";if(void 0===t.fragments)throw"dicomParser.readEncapsulatedPixelData: parameter 'element' refers to pixel data element that does not have encapsulated pixel data";if(r<0)throw"dicomParser.readEncapsulatedPixelData: parameter 'frame' must be >= 0";return 0!==t.basicOffsetTable.length?W(e,t,r):_(e,t,0,t.fragments.length)}t.default={isStringVr:d,isPrivateTag:f,parsePN:a,parseTM:n,parseDA:o,explicitElementToString:l,explicitDataSetToJS:u,createJPEGBasicOffsetTable:p,parseDicomDataSetExplicit:q,parseDicomDataSetImplicit:T,readFixedString:b,alloc:k,version:L,bigEndianByteArrayParser:N,ByteStream:J,sharedCopy:j,DataSet:w,findAndSetUNElementLength:y,findEndOfEncapsulatedElement:g,findItemDelimitationItemAndSetElementLength:x,littleEndianByteArrayParser:M,parseDicom:V,readDicomElementExplicit:B,readDicomElementImplicit:A,readEncapsulatedImageFrame:W,readEncapsulatedPixelData:K,readEncapsulatedPixelDataFromFragments:_,readPart10Header:G,readSequenceItemsExplicit:I,readSequenceItemsImplicit:F,readSequenceItem:S,readTag:h,LEI:"1.2.840.10008.1.2",LEE:"1.2.840.10008.1.2.1"}}],i={},n.m=a,n.c=i,n.d=function(e,t,r){n.o(e,t)||Object.defineProperty(e,t,{enumerable:!0,get:r})},n.r=function(e){"undefined"!=typeof Symbol&&Symbol.toStringTag&&Object.defineProperty(e,Symbol.toStringTag,{value:"Module"}),Object.defineProperty(e,"__esModule",{value:!0})},n.t=function(t,e){if(1&e&&(t=n(t)),8&e)return t;if(4&e&&"object"==typeof t&&t&&t.__esModule)return t;var r=Object.create(null);if(n.r(r),Object.defineProperty(r,"default",{enumerable:!0,value:t}),2&e&&"string"!=typeof t)for(var a in t)n.d(r,a,function(e){return t[e]}.bind(null,a));return r},n.n=function(e){var t=e&&e.__esModule?function(){return e.default}:function(){return e};return n.d(t,"a",t),t},n.o=function(e,t){return Object.prototype.hasOwnProperty.call(e,t)},n.p="",n(n.s=1);function n(e){if(i[e])return i[e].exports;var t=i[e]={i:e,l:!1,exports:{}};return a[e].call(t.exports,t,t.exports,n),t.l=!0,t.exports}var a,i});
+
+</script>
 <script src="https://cdn.flywheel.io/sdk/extension/flywheel-extension-0.14.9.min.js"></script>
 
 <script>window.DEMO_GEARS = [{"_id": "demo-slide-cell-count", "category": "analysis", "gear": {"name": "slide-cell-count", "label": "Slide cell count (ROI)", "description": "Detects and counts nuclei inside a region of a pathology whole-slide image (SVS or pyramidal TIFF). H&E: haematoxylin nuclei. IHC: nuclei classed DAB-positive or negative. Deterministic colour deconvolution and peak detection, no model weights. Writes one GeoJSON of point detections and a summary (count, density per mm\u00b2, percent positive) to the analysis info. Launched from the Slide Review app, which passes the ROI.", "version": "0.1.0", "author": "Flywheel", "maintainer": "Flywheel <support@flywheel.io>", "license": "MIT", "source": "https://gitlab.com/flywheel-io/ (verify)", "url": "https://gitlab.com/flywheel-io/ (verify)", "cite": "Ruifrok AC, Johnston DA. Quantification of histochemical staining by color deconvolution. Anal Quant Cytol Histol. 2001;23(4):291-299.", "command": "python3 /flywheel/v0/run.py", "environment": {"FLYWHEEL": "/flywheel/v0", "PYTHONUNBUFFERED": "1"}, "inputs": {"slide": {"base": "file", "description": "Whole-slide image: Aperio SVS or tiled pyramidal TIFF with JPEG, LZW or Deflate tiles."}}, "config": {"roi": {"type": "string", "description": "Region of interest as JSON: {\"id\": \"...\", \"points\": [[x, y], ...]} in level-0 pixels. Set by Slide Review.", "default": ""}, "stain": {"type": "string", "enum": ["H&E", "IHC-DAB"], "default": "H&E", "description": "H&E counts nuclei. IHC-DAB also classes each nucleus DAB-positive or negative."}, "sigma_um": {"type": "number", "minimum": 0.3, "maximum": 6, "default": 1.0, "description": "Smoothing before thresholding, in micrometres."}, "min_distance_um": {"type": "number", "minimum": 1, "maximum": 30, "default": 2.5, "description": "Minimum distance between two nucleus centres, in micrometres."}, "min_radius_um": {"type": "number", "minimum": 0.3, "maximum": 15, "default": 1.2, "description": "Ignore blobs thinner than this radius, in micrometres (debris, edges)."}, "threshold": {"type": "number", "minimum": 0, "maximum": 3, "default": 0, "description": "Haematoxylin optical-density threshold. 0 = automatic (Otsu inside the ROI)."}, "dab_threshold": {"type": "number", "minimum": 0, "maximum": 2, "default": 0.15, "description": "DAB optical density above which a nucleus is Positive (IHC-DAB only)."}, "max_roi_mm2": {"type": "number", "minimum": 0.01, "maximum": 400, "default": 25, "description": "Refuse ROIs larger than this, in mm\u00b2."}, "mpp_override": {"type": "number", "minimum": 0, "maximum": 50, "default": 0, "description": "Micrometres per pixel at level 0 when the file has no calibration. 0 = read from the file."}}, "custom": {"gear-builder": {"category": "analysis", "image": "flywheel/slide-cell-count:0.1.0"}, "flywheel": {"suite": "Digital Pathology"}, "fw-apps": {"slide_review": {"task": "cell-count", "label": "Count cells", "input": "slide", "roi_config": "roi", "max_roi_config": "max_roi_mm2", "hidden_config": ["roi", "mpp_override", "max_roi_mm2"]}, "outputs": [{"name_pattern": "*.cells.*.geojson", "type": "geojson", "role": "primary", "render": "points", "info_paths": ["cell_count"]}]}}}}];</script>
 <script>
 'use strict';
-const APP = 'slide-review', VERSION = '0.1.3';
+const APP = 'slide-review', VERSION = '0.2.0';
 const $ = s => document.querySelector(s);
 const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 
@@ -1606,6 +1611,11 @@ function makeTileSource(pyr, W, H) {
       const outW = Math.max(1, Math.round((x1 - x0) / need)), outH = Math.max(1, Math.round((y1 - y0) / need));
       const ac = new AbortController(); ctx.userData.ac = ac;
       const t0 = performance.now();
+      if (page.render) { // DICOM WSI: frames are fetched and drawn by the page itself
+        page.render(win, outW, outH, ac.signal).then(g => { S.tiles++; S.tileMs += performance.now() - t0; ctx.finish(g, null, 'context2d'); })
+          .catch(e => { if (!ac.signal.aborted) { logCall('tile', `L${level} ${x},${y}`, false, performance.now() - t0, String(e.message || e)); ctx.fail('tile read failed: ' + (e.message || e)); } });
+        return;
+      }
       const read = pool => page.img.readRGB({ window: win, width: outW, height: outH, interleave: true, enableAlpha: false, pool, signal: ac.signal, resampleMethod: 'bilinear' });
       read(S.pool).catch(e => { if (S.pool && !ac.signal.aborted) { S.pool = null; S.warnings.push('Decoder workers unavailable here; decoding on the main thread.'); return read(null); } throw e; })
         .then(rgb => {
@@ -1913,8 +1923,8 @@ function renderSlideInfo() {
   add('From', esc(S.mppSource));
   if (S.appMag) add('Scan mag.', S.appMag + '×');
   add('Physical', S.mpp ? `${(S.W * S.mpp / 1000).toFixed(2)} × ${(S.H * S.mpp / 1000).toFixed(2)} mm` : '—');
-  add('Pyramid', S.pages.map(p => `${p.w}×${p.h}${p.tiled ? '' : ' (strips)'}`).join('<br>'));
-  if (S.otherPages?.length) add('Other images', S.otherPages.map(p => `${p.w}×${p.h}`).join(', ') + ' <span style="color:var(--muted)">(label/macro, hidden)</span>');
+  add('Pyramid', S.pages.map(p => `${p.w}×${p.h}${p.tiled ? '' : ' (strips)'}${p.tw ? ` · ${p.tw}px frames` : ''}`).join('<br>'));
+  if (S.otherPages?.length) add('Other images', S.otherPages.map(p => p.w ? `${p.w}×${p.h}${p.why ? ' ' + esc(p.why) : ''}` : `${esc(p.path)}: ${esc(p.why)}`).join('<br>') + ' <span style="color:var(--muted)">(hidden)</span>');
   add('Compression', esc(S.compression || '—'));
   if (S.file) { add('File version', 'v' + S.file.version); add('File size', fmtBytes(S.file.size)); }
   const ann = S.saved ? `${esc(S.annName)} · v${S.saved.version}${S.saved.by ? ' · ' + esc(S.saved.by) : ''}` : `${esc(S.annName)} <span style="color:var(--muted)">(not saved yet)</span>`;
@@ -1933,7 +1943,8 @@ function renderDiag() {
     <dt>Bytes read</dt><dd>${fmtBytes(S.bytes)}${S.file ? ` of ${fmtBytes(S.file.size)}` : ''}</dd>
     <dt>Tiles</dt><dd>${S.tiles} · avg ${avg} ms</dd>
     <dt>Decoder</dt><dd>${S.pool ? 'worker pool' : 'main thread'}</dd>
-    <dt>Range honoured</dt><dd>${S.mode === 'demo' ? 'n/a' : S.rangeIgnored ? '<span style="color:var(--red-t)">no — whole file returned</span>' : 'yes'}</dd>
+    <dt>Range honoured</dt><dd>${S.mode === 'demo' ? 'n/a' : S.sourceKind === 'dicom' ? (DCM.rangeOK === true ? 'yes (zip member + range)' : DCM.rangeOK === false ? '<span style="color:var(--amber-t)">no: whole members downloaded</span>' : 'not tested yet') : S.rangeIgnored ? '<span style="color:var(--red-t)">no — whole file returned</span>' : 'yes'}</dd>
+    ${S.sourceKind === 'dicom' ? `<dt>DICOM</dt><dd>${S.pages.map(p => `${esc(p.member)} · ${p.w}×${p.h} · ${esc(p.offsetSource)}`).join('<br>')}<br>frames cached ${DCM.cache.size}</dd>` : ''}
     <dt>Tools</dt><dd>${esc((S.availTools || []).join(', '))}</dd>
     <dt>Frame</dt><dd>${innerWidth}×${innerHeight} · doc ${document.documentElement.clientHeight} · app ${Math.round(document.querySelector('.app').getBoundingClientRect().height)} · dpr ${devicePixelRatio} · resizes ${S.resizes || 0}</dd>
     <dt>Libraries</dt><dd>OpenSeadragon ${esc(OpenSeadragon.version?.versionStr || '?')} · Annotorious 3.9.5 + plugin-tools 1.6.0 · geotiff.js 3.0.5</dd></dl>
@@ -1979,6 +1990,219 @@ function updateHud() {
     $('#hudMag').textContent = (mag >= 10 ? mag.toFixed(0) : mag.toFixed(1)) + '×';
   } else { $('#sbLabel').textContent = 'no calibration'; $('#sbBar').style.width = '0'; $('#hudMag').textContent = (z * 100).toFixed(0) + '%'; }
 }
+
+/* ---------- DICOM whole-slide images (VL Whole Slide Microscopy) packed in a zip ----------
+   Each pyramid level is one DICOM instance (a zip member). We read each member's header by byte
+   range (ext.getFileBlob({member, range})), find the frame offsets (Extended Offset Table, Basic
+   Offset Table, or a fragment scan), then fetch individual JPEG frames on demand and let the
+   browser decode them. TILED_FULL only; one focal plane and optical path. */
+const DCM = { rangeOK: null, cache: new Map(), cacheMax: 600 };
+const WSI_SOP = '1.2.840.10008.5.1.4.1.1.77.1.6';
+const TS = {
+  '1.2.840.10008.1.2.4.50': 'JPEG baseline', '1.2.840.10008.1.2.4.51': 'JPEG extended',
+  '1.2.840.10008.1.2.4.90': 'JPEG 2000 (lossless)', '1.2.840.10008.1.2.4.91': 'JPEG 2000',
+  '1.2.840.10008.1.2.1': 'uncompressed (explicit LE)', '1.2.840.10008.1.2': 'uncompressed (implicit LE)',
+  '1.2.840.10008.1.2.4.70': 'JPEG lossless', '1.2.840.10008.1.2.4.80': 'JPEG-LS lossless', '1.2.840.10008.1.2.4.81': 'JPEG-LS',
+};
+const isZipDicom = f => /\.zip$/i.test(f.name || '') && (f.type === 'dicom' || /dicom|dcm/i.test(f.name || ''));
+
+class MemberReader {
+  constructor(file, m) { this.file = file; this.path = m.path; this.size = m.size; this.whole = null; this.loading = null; }
+  async loadWhole() {
+    if (this.whole) return this.whole;
+    if (this.size > 700e6) throw new Error(`${this.path} is ${fmtBytes(this.size)} and the host returned whole members, not ranges; too large to load in the browser.`);
+    this.loading = this.loading || timed('member', `${this.path} (whole, ${fmtBytes(this.size)})`, async () => {
+      const buf = await (await S.ext.getFileBlob(this.file, { member: this.path })).arrayBuffer();
+      S.bytes += buf.byteLength; this.whole = buf; return buf;
+    });
+    return this.loading;
+  }
+  async read(start, end) { // end inclusive
+    end = Math.min(end, this.size - 1);
+    if (this.whole) return this.whole.slice(start, end + 1);
+    if (DCM.rangeOK === false) return (await this.loadWhole()).slice(start, end + 1);
+    const want = end - start + 1, t0 = performance.now();
+    let buf;
+    try { buf = await (await S.ext.getFileBlob(this.file, { member: this.path, range: `bytes=${start}-${end}` })).arrayBuffer(); }
+    catch (e) { logCall('member', `${this.path} bytes=${start}-${end}`, false, performance.now() - t0, String(e.message || e)); throw e; }
+    if (buf.byteLength === want || (buf.byteLength < want && buf.byteLength !== this.size)) {
+      DCM.rangeOK = true; S.bytes += buf.byteLength;
+      logCall('member', `${this.path} bytes=${start}-${end} → ${fmtBytes(buf.byteLength)}`, true, performance.now() - t0);
+      return buf;
+    }
+    // the host ignored the range and sent the whole member: keep it and serve every later read from memory
+    if (DCM.rangeOK !== false) S.warnings.push('The host returned whole zip members instead of byte ranges, so each pyramid level is downloaded in full the first time it is needed.');
+    DCM.rangeOK = false; this.whole = buf; S.bytes += buf.byteLength;
+    logCall('member', `${this.path} range ignored → whole ${fmtBytes(buf.byteLength)}`, true, performance.now() - t0);
+    return buf.slice(start, end + 1);
+  }
+}
+
+async function readDicomHeader(r) {
+  let n = Math.min(r.size, 64 * 1024), lastErr;
+  for (;;) {
+    const buf = await r.read(0, n - 1);
+    try {
+      const ds = dicomParser.parseDicom(patchNewVRs(new Uint8Array(buf.slice(0))), { untilTag: 'x7fe00010' });
+      if (ds.elements.x7fe00010) return { ds, buf };
+      lastErr = new Error('no pixel data element');
+    } catch (e) { lastErr = e; }
+    if (n >= r.size) throw new Error(`${r.path}: not a readable DICOM file (${lastErr && (lastErr.message || lastErr)})`);
+    n = Math.min(r.size, n * 4);
+  }
+}
+// dicom-parser 1.8 predates the OV/SV/UV value representations (used by the Extended Offset Table).
+// They have 4-byte lengths like OB, so relabel them OB in a copy of the header before parsing.
+function patchNewVRs(bytes) {
+  for (let i = 0; i + 8 < bytes.length; i++) {
+    const a = bytes[i + 4], b = bytes[i + 5];
+    if (((a === 0x4F || a === 0x53 || a === 0x55) && b === 0x56) && bytes[i + 6] === 0 && bytes[i + 7] === 0) { // 'OV' 'SV' 'UV' + 2 reserved zero bytes
+      const g = bytes[i] | (bytes[i + 1] << 8);
+      if (g % 2 === 0 && g !== 0) { bytes[i + 4] = 0x4F; bytes[i + 5] = 0x42; }
+    }
+  }
+  return bytes;
+}
+const u32 = (buf, off) => new DataView(buf).getUint32(off, true);
+const tagAt = (buf, off) => { const v = new DataView(buf); return [v.getUint16(off, true), v.getUint16(off + 2, true), v.getUint32(off + 4, true)]; };
+
+function wsiMeta(ds) {
+  const str = t => { try { return ds.string(t) || ''; } catch (e) { return ''; } };
+  const meta = {
+    sop: str('x00080016'), imageType: str('x00080008').toUpperCase(), ts: str('x00020010'),
+    W: ds.uint32('x00480006'), H: ds.uint32('x00480007'), tw: ds.uint16('x00280011'), th: ds.uint16('x00280010'),
+    frames: parseInt(str('x00280008') || '1', 10), org: str('x00209311').toUpperCase(), photometric: str('x00280004').toUpperCase(),
+    spp: ds.uint16('x00280002') || 3, bits: ds.uint16('x00280100') || 8,
+  };
+  // pixel spacing (mm) from Shared Functional Groups > Pixel Measures
+  try { const sh = ds.elements.x52009229?.items?.[0]?.dataSet; const pm = sh?.elements.x00289110?.items?.[0]?.dataSet; const ps = pm && pm.string('x00280030'); if (ps) meta.mpp = parseFloat(ps.split('\\')[0]) * 1000; } catch (e) {}
+  if (!meta.mpp) { const wmm = parseFloat(str('x00480001')); if (wmm && meta.W) meta.mpp = wmm * 1000 / meta.W; }
+  meta.label = /LABEL|OVERVIEW|THUMBNAIL/.test(meta.imageType) ? meta.imageType.split('\\').find(x => /LABEL|OVERVIEW|THUMBNAIL/.test(x)) : 'VOLUME';
+  return meta;
+}
+
+async function frameTable(r, ds, buf, meta) {
+  const px = ds.elements.x7fe00010, P = px.dataOffset; // P = start of the first item (the BOT) or of raw pixel data
+  if (!px.hadUndefinedLength) { // native (uncompressed) pixel data
+    const fl = meta.tw * meta.th * meta.spp * (meta.bits / 8);
+    return { native: true, offsets: Array.from({ length: meta.frames }, (_, i) => [P + i * fl, fl]) };
+  }
+  const head = buf.byteLength >= P + 8 ? buf : await r.read(0, P + 7);
+  const [g, e, botLen] = tagAt(head, P);
+  if (g !== 0xFFFE || e !== 0xE000) throw new Error(`${r.path}: unexpected item at the start of pixel data`);
+  const base = P + 8 + botLen; // first fragment item
+  // Extended Offset Table (7FE0,0001) + lengths (7FE0,0002): 64-bit, relative to the first fragment
+  const eot = ds.elements.x7fe00001, eotl = ds.elements.x7fe00002;
+  if (eot && eotl && eot.length >= meta.frames * 8) {
+    const v = new DataView(buf), out = [];
+    for (let i = 0; i < meta.frames; i++) { const o = Number(v.getBigUint64(eot.dataOffset + i * 8, true)), l = Number(v.getBigUint64(eotl.dataOffset + i * 8, true)); out.push([base + o + 8, l]); }
+    return { offsets: out, source: 'extended offset table' };
+  }
+  if (botLen >= meta.frames * 4) {
+    const bot = buf.byteLength >= P + 8 + botLen ? buf.slice(P + 8, P + 8 + botLen) : await r.read(P + 8, P + 8 + botLen - 1);
+    const offs = Array.from({ length: meta.frames }, (_, i) => u32(bot, i * 4));
+    // frame i spans [base+offs[i], base+offs[i+1]); its fragments are parsed when fetched
+    return { offsets: offs.map((o, i) => [base + o, (i + 1 < offs.length ? offs[i + 1] : r.size - 8 - base) - o, true]), source: 'basic offset table' };
+  }
+  // no offset table: walk the fragment items (needs the whole member)
+  const whole = await r.loadWhole(), v = new DataView(whole), out = [];
+  let p = base;
+  while (p + 8 <= whole.byteLength && out.length < meta.frames) {
+    const gg = v.getUint16(p, true), ee = v.getUint16(p + 2, true), len = v.getUint32(p + 4, true);
+    if (gg !== 0xFFFE || ee !== 0xE000) break;
+    out.push([p + 8, len]); p += 8 + len;
+  }
+  if (out.length < meta.frames) throw new Error(`${r.path}: found ${out.length} of ${meta.frames} frames (multi-fragment frames without an offset table are not supported)`);
+  return { offsets: out, source: 'fragment scan' };
+}
+function fragmentsPayload(buf) { // concatenate the payloads of the fragment items in buf
+  const v = new DataView(buf), parts = []; let p = 0, total = 0;
+  while (p + 8 <= buf.byteLength) {
+    const g = v.getUint16(p, true), e = v.getUint16(p + 2, true), len = v.getUint32(p + 4, true);
+    if (g !== 0xFFFE || e !== 0xE000) break;
+    parts.push(new Uint8Array(buf, p + 8, Math.min(len, buf.byteLength - p - 8))); total += len; p += 8 + len;
+  }
+  if (parts.length === 1) return parts[0];
+  const out = new Uint8Array(total); let o = 0; for (const q of parts) { out.set(q, o); o += q.length; } return out;
+}
+const ADOBE_RGB = new Uint8Array([0xFF, 0xEE, 0x00, 0x0E, 0x41, 0x64, 0x6F, 0x62, 0x65, 0x00, 0x64, 0x00, 0x00, 0x00, 0x00, 0x00]);
+function jpegForBrowser(bytes, photometric) {
+  // DICOM "RGB" JPEG frames often lack an Adobe marker, so browsers would treat them as YCbCr. Add one (transform 0).
+  if (photometric !== 'RGB' || bytes[0] !== 0xFF || bytes[1] !== 0xD8) return bytes;
+  for (let i = 2; i < Math.min(bytes.length - 4, 2048); i++) if (bytes[i] === 0xFF && bytes[i + 1] === 0xEE) return bytes;
+  const out = new Uint8Array(bytes.length + ADOBE_RGB.length); out.set(bytes.subarray(0, 2), 0); out.set(ADOBE_RGB, 2); out.set(bytes.subarray(2), 2 + ADOBE_RGB.length); return out;
+}
+
+async function openDicomZip(file) {
+  const info = await timed('sdk', 'getArchiveMembers', () => S.ext.getArchiveMembers(file));
+  const members = (info.members || []).filter(m => m.size > 0 && !/\/$/.test(m.path) && !/DICOMDIR$/i.test(m.path));
+  if (!members.length) throw new Error('The zip has no files in it.');
+  const levels = [], others = [];
+  // read headers in parallel, a few at a time
+  const queue = members.slice(); const workers = Array.from({ length: Math.min(4, queue.length) }, async () => {
+    while (queue.length) {
+      const m = queue.shift(), r = new MemberReader(file, m);
+      try {
+        const { ds, buf } = await readDicomHeader(r); const meta = wsiMeta(ds);
+        if (meta.sop && meta.sop !== WSI_SOP) { others.push({ path: m.path, why: 'not a whole-slide image' }); continue; }
+        if (meta.label !== 'VOLUME' || !meta.W) { others.push({ path: m.path, w: meta.W, h: meta.H, why: meta.label.toLowerCase() }); continue; }
+        levels.push({ r, ds, buf, meta });
+      } catch (e) { others.push({ path: m.path, why: e.message || String(e) }); }
+    }
+  });
+  await Promise.all(workers);
+  if (!levels.length) throw new Error('No whole-slide image levels found in this zip. ' + (others[0] ? `First member: ${others[0].why}.` : ''));
+  levels.sort((a, b) => b.meta.W - a.meta.W);
+  // one level per size (some exports repeat a level per focal plane or optical path)
+  const uniq = levels.filter((l, i) => i === 0 || l.meta.W !== levels[i - 1].meta.W);
+  const top = uniq[0].meta;
+  for (const l of uniq) {
+    if (l.meta.org && l.meta.org !== 'TILED_FULL') throw new Error(`${l.r.path}: ${l.meta.org} tiling is not supported yet (TILED_FULL only).`);
+    if (/2000|LOSSLESS|JPEG-LS/i.test(TS[l.meta.ts] || '') || /\.4\.(9[01]|70|8[01])$/.test(l.meta.ts)) throw new Error(`Frames are ${TS[l.meta.ts] || l.meta.ts}, which the browser can't decode. JPEG baseline and uncompressed are supported.`);
+  }
+  const pyr = [];
+  for (const l of uniq) {
+    const tbl = await frameTable(l.r, l.ds, l.buf, l.meta);
+    const m = l.meta, cols = Math.ceil(m.W / m.tw), rows = Math.ceil(m.H / m.th);
+    if (m.frames < cols * rows) throw new Error(`${l.r.path}: ${m.frames} frames for a ${cols}×${rows} grid; sparse tiling is not supported yet.`);
+    const page = { w: m.W, h: m.H, d: top.W / m.W, tiled: true, tw: m.tw, th: m.th, cols, rows, member: l.r.path, offsetSource: tbl.source || 'native', ts: TS[m.ts] || m.ts };
+    const key = l.r.path;
+    page.frame = idx => {
+      const k = key + '#' + idx; let p = DCM.cache.get(k);
+      if (p) { DCM.cache.delete(k); DCM.cache.set(k, p); return p; }
+      p = (async () => {
+        const [off, len, viaBot] = tbl.offsets[idx];
+        const raw = await l.r.read(off, off + len - 1);
+        if (tbl.native) {
+          const c = new OffscreenCanvas(m.tw, m.th), g = c.getContext('2d'), id = g.createImageData(m.tw, m.th), s = new Uint8Array(raw);
+          for (let i = 0, j = 0; i < m.tw * m.th; i++, j += 4) { id.data[j] = s[i * 3]; id.data[j + 1] = s[i * 3 + 1]; id.data[j + 2] = s[i * 3 + 2]; id.data[j + 3] = 255; }
+          g.putImageData(id, 0, 0); return c.transferToImageBitmap();
+        }
+        const bytes = viaBot ? fragmentsPayload(raw) : new Uint8Array(raw);
+        return createImageBitmap(new Blob([jpegForBrowser(bytes, m.photometric)], { type: 'image/jpeg' }));
+      })();
+      p.catch(() => DCM.cache.delete(k));
+      DCM.cache.set(k, p);
+      while (DCM.cache.size > DCM.cacheMax) { const [k0, p0] = DCM.cache.entries().next().value; DCM.cache.delete(k0); p0.then(b => b.close && b.close(), () => {}); }
+      return p;
+    };
+    page.render = async (win, outW, outH, signal) => {
+      const [x0, y0, x1, y1] = win, sx = outW / (x1 - x0), sy = outH / (y1 - y0);
+      const c0 = Math.floor(x0 / m.tw), c1 = Math.min(cols - 1, Math.floor((x1 - 1) / m.tw)), r0 = Math.floor(y0 / m.th), r1 = Math.min(rows - 1, Math.floor((y1 - 1) / m.th));
+      const jobs = [];
+      for (let rr = r0; rr <= r1; rr++) for (let cc = c0; cc <= c1; cc++) jobs.push(page.frame(rr * cols + cc).then(bmp => ({ bmp, rr, cc })));
+      const got = await Promise.all(jobs);
+      if (signal && signal.aborted) throw new Error('aborted');
+      const cv = document.createElement('canvas'); cv.width = outW; cv.height = outH;
+      const g = cv.getContext('2d'); g.fillStyle = '#fff'; g.fillRect(0, 0, outW, outH); g.imageSmoothingQuality = 'high';
+      for (const { bmp, rr, cc } of got) g.drawImage(bmp, (cc * m.tw - x0) * sx, (rr * m.th - y0) * sy, m.tw * sx, m.th * sy);
+      return g;
+    };
+    pyr.push(page);
+  }
+  return { pyr, others, W: top.W, H: top.H, mpp: top.mpp || null, mppSource: top.mpp ? 'DICOM Pixel Spacing' : 'not found', ts: TS[top.ts] || top.ts, photometric: top.photometric };
+}
+
 
 /* ---------- Analyze: run slide gears live (cell count etc.) ----------
    Discovery: gears whose manifest declares custom['fw-apps'].slide_review (the output-contract convention).
@@ -2094,7 +2318,7 @@ async function discoverGears() {
       const all = await timed('sdk', 'listGears', () => S.ext.listGears({ limit: 500 }));
       const list = Array.isArray(all) ? all : all?.results || [];
       const allow = Array.isArray(S.ext.params?.gears) ? S.ext.params.gears : null;
-      AZ.gears = list.filter(g => !g.disabled && srOf(g) && (!allow || allow.includes(g.gear.name)));
+      AZ.gears = list.filter(g => !g.disabled && srOf(g) && (!allow || allow.includes(g.gear.name)) && (srOf(g).formats || ['svs', 'tiff']).includes(S.sourceKind === 'dicom' ? 'dicom-zip' : (/\.svs$/i.test(S.slideName || '') ? 'svs' : 'tiff')));
       // keep the newest version of each gear name
       const by = new Map(); for (const g of AZ.gears) { const p = by.get(g.gear.name); if (!p || cmpVer(g.gear.version, p.gear.version) > 0) by.set(g.gear.name, g); }
       AZ.gears = [...by.values()];
@@ -2127,7 +2351,7 @@ function currentRegion() {
 function renderAnalyze() {
   const el = $('#analyze'); if (!el) return;
   if (!AZ.gears.length) {
-    el.innerHTML = `<div class="sec">Run an analysis</div><div class="card note">${AZ.why ? `<div class="err">${esc(AZ.why)}</div>` : ''}No gear on this site is set up for Slide Review. A gear appears here when its manifest declares <code>custom["fw-apps"].slide_review</code>. Install <b>slide-cell-count</b> (in the repo under <code>gear/</code>) to get cell counting.</div>${renderJobs()}`;
+    el.innerHTML = `<div class="sec">Run an analysis</div><div class="card note">${AZ.why ? `<div class="err">${esc(AZ.why)}</div>` : ''}No gear on this site is set up for Slide Review${S.sourceKind === 'dicom' ? ' with DICOM whole-slide zips (a gear opts in with <code>slide_review.formats: ["dicom-zip"]</code>)' : ''}. A gear appears here when its manifest declares <code>custom["fw-apps"].slide_review</code>. Install <b>slide-cell-count</b> (in the repo under <code>gear/</code>) to get cell counting.</div>${renderJobs()}`;
     wireJobs(); return;
   }
   const g = AZ.gear, sr = srOf(g), hidden = new Set(sr.hidden_config || [sr.roi_config]);
@@ -2367,10 +2591,21 @@ async function startWith(tiff, name) {
   const comp = { 1: 'none', 5: 'LZW', 7: 'JPEG', 8: 'Deflate', 33003: 'JPEG 2000 (Aperio)', 33005: 'JPEG 2000 (Aperio)', 34712: 'JPEG 2000', 50001: 'WebP', 50000: 'Zstd' };
   const cc = main.tag('Compression'); S.compression = comp[cc] || ('code ' + cc);
   if (/2000/.test(S.compression)) S.warnings.push('This slide uses JPEG 2000 tiles, which geotiff.js cannot decode without an extra codec (verify). Convert to JPEG-tiled TIFF/COG, or add an OpenJPEG WASM decoder.');
-  if (!mp.mpp) S.warnings.push('No pixel size found in the file. Measurements are in pixels until calibration is known.');
-  S.slideName = name; S.annName = name.replace(/\.(svs|tiff?|ome\.tiff?|btf|qptiff)$/i, '') + '.annotations.geojson';
-  $('#slideTitle').textContent = name; document.title = name + ' · Slide Review';
   try { S.pool = new GeoTIFF.Pool(Math.min(4, navigator.hardwareConcurrency || 2)); } catch (e) { S.pool = null; }
+  S.sourceKind = 'tiff';
+  finishStart(name, pyr);
+}
+async function startWithDicom(file) {
+  setLoading(true, 'Opening slide', 'Reading the DICOM headers in the zip…');
+  const sl = await timed('dicom', 'read WSI levels', () => openDicomZip(file));
+  S.pages = sl.pyr; S.otherPages = sl.others; S.W = sl.W; S.H = sl.H; S.mpp = sl.mpp; S.mppSource = sl.mppSource; S.appMag = null; S.appMagMpp = null;
+  S.compression = `${sl.ts} · ${sl.photometric} · offsets from ${sl.pyr[0].offsetSource}`; S.sourceKind = 'dicom';
+  finishStart(file.name, sl.pyr);
+}
+function finishStart(name, pyr) {
+  if (!S.mpp) S.warnings.push('No pixel size found in the file. Measurements are in pixels until calibration is known.');
+  S.slideName = name; S.annName = name.replace(/\.(dicom\.zip|zip|svs|tiff?|ome\.tiff?|btf|qptiff)$/i, '') + '.annotations.geojson';
+  $('#slideTitle').textContent = name; document.title = name + ' · Slide Review';
   initViewer(makeTileSource(pyr, S.W, S.H));
   renderTools(); renderClasses(); renderAnnotations(); markDirty(false);
   discoverGears().then(() => { if (curTab === 'analyze') renderAnalyze(); });
@@ -2424,11 +2659,17 @@ async function bootLive() {
   AZ.canRun = perms ? (perms.has('analyses_create_job') || isAdmin) : true;
   if (!AZ.canRun) AZ.why = 'You can’t run analyses on this container (needs the “run gears and create analyses” permission).';
   $('#eyebrow').textContent = [S.container.label ? (S.container.container_type || parent.type) + ' · ' + S.container.label : null, 'slide review'].filter(Boolean).join(' · ');
-  S.dataPath = 'geotiff.js over SDK getFileBlob({range}) · proxied by the host frame';
-  setSource('blue', 'Live · Flywheel', S.dataPath);
-  const client = makeFlywheelClient(ext, file);
-  const tiff = await GeoTIFF.fromCustomClient(client, { blockSize: 128 * 1024, cacheSize: 256 });
-  await startWith(tiff, file.name);
+  if (isZipDicom(file)) {
+    S.dataPath = 'DICOM WSI in a zip · SDK getFileBlob({member, range}) · frames decoded by the browser';
+    setSource('blue', 'Live · Flywheel', S.dataPath);
+    await startWithDicom(file);
+  } else {
+    S.dataPath = 'geotiff.js over SDK getFileBlob({range}) · proxied by the host frame';
+    setSource('blue', 'Live · Flywheel', S.dataPath);
+    const client = makeFlywheelClient(ext, file);
+    const tiff = await GeoTIFF.fromCustomClient(client, { blockSize: 128 * 1024, cacheSize: 256 });
+    await startWith(tiff, file.name);
+  }
   if (S.readOnly) $('#roWarn').innerHTML = `<div class="warn">Read-only: ${params.readOnly ? 'this app is registered read-only' : 'you can’t upload files here'}. You can still view and export.</div>`;
   // existing annotations next to the slide
   const rec = (S.container.files || []).find(f => f.name === S.annName);
