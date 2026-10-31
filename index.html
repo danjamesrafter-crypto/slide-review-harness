@@ -1505,7 +1505,7 @@ void main(void)\r
 <script>window.DEMO_GEARS = [{"_id": "demo-slide-cell-count", "category": "analysis", "gear": {"name": "slide-cell-count", "label": "Slide cell count (ROI)", "description": "Detects and counts nuclei inside a region of a pathology whole-slide image (SVS or pyramidal TIFF). H&E: haematoxylin nuclei. IHC: nuclei classed DAB-positive or negative. Deterministic colour deconvolution and peak detection, no model weights. Writes one GeoJSON of point detections and a summary (count, density per mm\u00b2, percent positive) to the analysis info. Launched from the Slide Review app, which passes the ROI.", "version": "0.1.0", "author": "Flywheel", "maintainer": "Flywheel <support@flywheel.io>", "license": "MIT", "source": "https://gitlab.com/flywheel-io/ (verify)", "url": "https://gitlab.com/flywheel-io/ (verify)", "cite": "Ruifrok AC, Johnston DA. Quantification of histochemical staining by color deconvolution. Anal Quant Cytol Histol. 2001;23(4):291-299.", "command": "python3 /flywheel/v0/run.py", "environment": {"FLYWHEEL": "/flywheel/v0", "PYTHONUNBUFFERED": "1"}, "inputs": {"slide": {"base": "file", "description": "Whole-slide image: Aperio SVS or tiled pyramidal TIFF with JPEG, LZW or Deflate tiles."}}, "config": {"roi": {"type": "string", "description": "Region of interest as JSON: {\"id\": \"...\", \"points\": [[x, y], ...]} in level-0 pixels. Set by Slide Review.", "default": ""}, "stain": {"type": "string", "enum": ["H&E", "IHC-DAB"], "default": "H&E", "description": "H&E counts nuclei. IHC-DAB also classes each nucleus DAB-positive or negative."}, "sigma_um": {"type": "number", "minimum": 0.3, "maximum": 6, "default": 1.0, "description": "Smoothing before thresholding, in micrometres."}, "min_distance_um": {"type": "number", "minimum": 1, "maximum": 30, "default": 2.5, "description": "Minimum distance between two nucleus centres, in micrometres."}, "min_radius_um": {"type": "number", "minimum": 0.3, "maximum": 15, "default": 1.2, "description": "Ignore blobs thinner than this radius, in micrometres (debris, edges)."}, "threshold": {"type": "number", "minimum": 0, "maximum": 3, "default": 0, "description": "Haematoxylin optical-density threshold. 0 = automatic (Otsu inside the ROI)."}, "dab_threshold": {"type": "number", "minimum": 0, "maximum": 2, "default": 0.15, "description": "DAB optical density above which a nucleus is Positive (IHC-DAB only)."}, "max_roi_mm2": {"type": "number", "minimum": 0.01, "maximum": 400, "default": 25, "description": "Refuse ROIs larger than this, in mm\u00b2."}, "mpp_override": {"type": "number", "minimum": 0, "maximum": 50, "default": 0, "description": "Micrometres per pixel at level 0 when the file has no calibration. 0 = read from the file."}}, "custom": {"gear-builder": {"category": "analysis", "image": "flywheel/slide-cell-count:0.1.0"}, "flywheel": {"suite": "Digital Pathology"}, "fw-apps": {"slide_review": {"task": "cell-count", "label": "Count cells", "input": "slide", "roi_config": "roi", "max_roi_config": "max_roi_mm2", "hidden_config": ["roi", "mpp_override", "max_roi_mm2"]}, "outputs": [{"name_pattern": "*.cells.*.geojson", "type": "geojson", "role": "primary", "render": "points", "info_paths": ["cell_count"]}]}}}}];</script>
 <script>
 'use strict';
-const APP = 'slide-review', VERSION = '0.2.2';
+const APP = 'slide-review', VERSION = '0.2.3';
 const $ = s => document.querySelector(s);
 const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 
@@ -2088,8 +2088,14 @@ class ZipMember {
         if (this.error) throw this.error;
         if (this.cpos >= this.csize) { await this.drained; if (this.outLen < n) throw new Error(`${this.path}: ended early`); break; }
         if (!this.pending) this.pending = (async () => {
-          const d = await this.dataStart(), c1 = Math.min(this.csize, this.cpos + (this.cpos === 0 ? 256 * 1024 : ZIP_CHUNK));
-          const chunk = await zipRange(this.file, d + this.cpos, d + c1 - 1); this.cpos = c1;
+          const d = await this.dataStart();
+          // keep up to 3 compressed chunks in flight so the host round trips overlap with inflating
+          this.q = this.q || []; this.qpos = this.qpos ?? this.cpos;
+          while (this.q.length < 3 && this.qpos < this.csize) {
+            const c0 = this.qpos, c1 = Math.min(this.csize, c0 + (c0 === 0 ? 256 * 1024 : ZIP_CHUNK)); this.qpos = c1;
+            this.q.push({ c1, p: zipRange(this.file, d + c0, d + c1 - 1) });
+          }
+          const job = this.q.shift(); const chunk = await job.p; this.cpos = job.c1;
           await this.writer.write(new Uint8Array(chunk));
           if (this.cpos >= this.csize) await this.writer.close().catch(() => {});
           await new Promise(r => setTimeout(r, 0)); // let the reader drain
@@ -2272,7 +2278,10 @@ async function openDicomZip(file) {
       if (signal && signal.aborted) throw new Error('aborted');
       const cv = document.createElement('canvas'); cv.width = outW; cv.height = outH;
       const g = cv.getContext('2d'); g.fillStyle = '#fff'; g.fillRect(0, 0, outW, outH); g.imageSmoothingQuality = 'high';
-      for (const { bmp, rr, cc } of got) g.drawImage(bmp, (cc * m.tw - x0) * sx, (rr * m.th - y0) * sy, m.tw * sx, m.th * sy);
+      for (const { bmp, rr, cc } of got) { // whole-pixel edges so neighbouring frames meet without hairline seams
+        const ax = Math.round((cc * m.tw - x0) * sx), bx = Math.round(((cc + 1) * m.tw - x0) * sx), ay = Math.round((rr * m.th - y0) * sy), by = Math.round(((rr + 1) * m.th - y0) * sy);
+        g.drawImage(bmp, ax, ay, Math.max(1, bx - ax), Math.max(1, by - ay));
+      }
       return g;
     };
     pyr.push(page);
