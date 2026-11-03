@@ -2770,6 +2770,8 @@ html,body{margin:0;height:100%;overflow:hidden;background:var(--page-light);colo
 .sr-job-h{display:flex;gap:8px;align-items:flex-start;justify-content:space-between}
 .sr-kpis{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
 .sr-kpi{display:flex;flex-direction:column;gap:2px}
+.sr-reasons{margin:0;padding-left:18px;display:flex;flex-direction:column;gap:2px}
+.sr-legend{display:inline-flex;align-items:center;gap:6px;margin-right:6px}
 .sr-call{display:flex;align-items:flex-start;gap:8px;padding:6px 16px;border-bottom:1px solid var(--separations-base)}
 /* Annotorious handles on black */
 .a9s-annotation.selected .a9s-inner{stroke-width:2}
@@ -12381,10 +12383,21 @@ __ds_ns.Tree = __ds_scope.Tree;
     return /* @__PURE__ */ React.createElement("div", { className: "sr-kpi" }, /* @__PURE__ */ React.createElement(Typography, { variant: "h2", className: "sr-num" }, v), /* @__PURE__ */ React.createElement(Typography, { variant: "p4", color: "light" }, k));
   }
   function JobCard({ j }) {
-    const [c, t] = JOB_STATE[j.state] || ["slate", j.state], s = j.summary, el = j.end ? ((j.end - j.start) / 1e3).toFixed(1) + " s" : ((Date.now() - j.start) / 1e3).toFixed(0) + " s", icon = { complete: "done-check-tracked", failed: "warning-circle", running: "clock-loading", loading: "download-status" }[j.state] || "clock-history";
-    return /* @__PURE__ */ React.createElement("div", { className: "sr-job" }, /* @__PURE__ */ React.createElement("div", { className: "sr-job-h" }, /* @__PURE__ */ React.createElement("span", { className: "sr-row-txt" }, /* @__PURE__ */ React.createElement(Typography, { variant: "h5", overflow: !0 }, j.label), /* @__PURE__ */ React.createElement(Typography, { variant: "p4", color: "light", overflow: !0 }, j.gearName, " ", j.gearVersion, " \xB7 ", j.roiLabel)), /* @__PURE__ */ React.createElement(Tag, { size: "large", color: c, icon, title: t })), !j.end && /* @__PURE__ */ React.createElement(ProgressBar, { mode: "indeterminate", value: 0, color: "primary" }), s && /* @__PURE__ */ React.createElement("div", { className: "sr-kpis" }, /* @__PURE__ */ React.createElement(Kpi, { v: s.count.toLocaleString(), k: "Cells" }), /* @__PURE__ */ React.createElement(Kpi, { v: s.density_per_mm2 != null ? Math.round(s.density_per_mm2).toLocaleString() : "\u2014", k: "Per mm\xB2" }), s.percent_positive != null ? /* @__PURE__ */ React.createElement(Kpi, { v: s.percent_positive + "%", k: "Positive" }) : /* @__PURE__ */ React.createElement(Kpi, { v: s.roi_area_mm2 != null ? s.roi_area_mm2.toFixed(3) : "\u2014", k: "mm\xB2" })), s && /* @__PURE__ */ React.createElement("div", { className: "sr-tags" }, Object.entries(s.by_class || {}).map(([cl, n]) => /* @__PURE__ */ React.createElement(Tag, { key: cl, color: cl === "Positive" ? "orange" : cl === "Negative" ? "slate" : "primary", title: `${cl} ${n.toLocaleString()}` }))), j.error && /* @__PURE__ */ React.createElement(AlertPanel, { severity: "error", description: j.error }), /* @__PURE__ */ React.createElement(Typography, { variant: "p4", color: "light" }, j.jobId ? `Job ${String(j.jobId).slice(-8)} \xB7 ` : "", el, s ? ` \xB7 threshold ${s.threshold_used}` : ""), /* @__PURE__ */ React.createElement("div", { className: "sr-btns" }, s && /* @__PURE__ */ React.createElement(Button, { size: "small", variant: "outlined", startIcon: j.visible ? "visible-eye-hidden" : "show-visible", onClick: () => jobToggle(j) }, j.visible ? "Hide Cells" : "Show Cells"), s && /* @__PURE__ */ React.createElement(Button, { size: "small", variant: "ghost", startIcon: "object-search-zoom-plus", onClick: () => jobZoom(j) }, "Zoom To"), s && j.annId && !S.readOnly && /* @__PURE__ */ React.createElement(Button, { size: "small", variant: "ghost", startIcon: "notes-pen", onClick: () => jobNote(j) }, "Add to Note"), /* @__PURE__ */ React.createElement("span", { className: "sr-grow" }), /* @__PURE__ */ React.createElement(Tip, { title: "Remove from List", position: "left" }, /* @__PURE__ */ React.createElement(IconButton, { icon: "close", size: "small", color: "slate", "aria-label": "Remove", onClick: () => jobRemove(j) }))));
+    const [c, t] = JOB_STATE[j.state] || ["slate", j.state], s = j.summary, el = j.previous ? "Earlier analysis" : j.end ? ((j.end - j.start) / 1e3).toFixed(1) + " s" : ((Date.now() - j.start) / 1e3).toFixed(0) + " s", i = j.info, top = Object.entries(i?.artifacts_pct_of_tissue || {}).filter(([, v]) => v != null).sort((a, b) => b[1] - a[1]).slice(0, 3), legend = polyLegend(j), icon = { complete: "done-check-tracked", failed: "warning-circle", running: "clock-loading", loading: "download-status" }[j.state] || "clock-history";
+    return /* @__PURE__ */ React.createElement("div", { className: "sr-job" }, /* @__PURE__ */ React.createElement("div", { className: "sr-job-h" }, /* @__PURE__ */ React.createElement("span", { className: "sr-row-txt" }, /* @__PURE__ */ React.createElement(Typography, { variant: "h5", overflow: !0 }, j.label), /* @__PURE__ */ React.createElement(Typography, { variant: "p4", color: "light", overflow: !0 }, j.gearName, " ", j.gearVersion, " \xB7 ", j.roiLabel)), /* @__PURE__ */ React.createElement(Tag, { size: "large", color: c, icon, title: t })), !j.end && /* @__PURE__ */ React.createElement(ProgressBar, { mode: "indeterminate", value: 0, color: "primary" }), i?.verdict && /* @__PURE__ */ React.createElement("div", { className: "sr-tags" }, /* @__PURE__ */ React.createElement(Tag, { size: "large", color: VERDICT_TAG[i.verdict] || "slate", icon: i.verdict === "pass" ? "done-check-tracked" : "warning-circle", title: String(i.verdict).toUpperCase() }), i.scope && /* @__PURE__ */ React.createElement(Typography, { variant: "p4", color: "light" }, i.scope), i.reliable === !1 && /* @__PURE__ */ React.createElement(Typography, { variant: "p4", color: "light" }, "Not reliable")), (i?.reasons || []).length > 0 && /* @__PURE__ */ React.createElement("ul", { className: "sr-reasons" }, i.reasons.map((r, k) => /* @__PURE__ */ React.createElement("li", { key: k }, /* @__PURE__ */ React.createElement(Typography, { variant: "p3" }, r)))), i && (i.usable_area_mm2 != null || top.length > 0) && /* @__PURE__ */ React.createElement("div", { className: "sr-kpis" }, i.usable_area_mm2 != null && /* @__PURE__ */ React.createElement(Kpi, { v: (+i.usable_area_mm2).toFixed(2), k: "Usable mm\xB2" }), top.map(([k, v]) => /* @__PURE__ */ React.createElement(Kpi, { key: k, v: v + "%", k: titleCase(k) }))), legend.length > 0 && /* @__PURE__ */ React.createElement("div", { className: "sr-tags" }, legend.map((p) => /* @__PURE__ */ React.createElement("span", { key: p.name, className: "sr-legend" }, /* @__PURE__ */ React.createElement("span", { className: "sr-swatch", style: { background: `rgb(${p.color.join(",")})` } }), /* @__PURE__ */ React.createElement(Typography, { variant: "p4", color: "base" }, p.name)))), s && /* @__PURE__ */ React.createElement("div", { className: "sr-kpis" }, /* @__PURE__ */ React.createElement(Kpi, { v: s.count.toLocaleString(), k: j.render === "contours" ? "Nuclei" : "Cells" }), /* @__PURE__ */ React.createElement(Kpi, { v: s.density_per_mm2 != null ? Math.round(s.density_per_mm2).toLocaleString() : "\u2014", k: "Per mm\xB2" }), s.percent_positive != null ? /* @__PURE__ */ React.createElement(Kpi, { v: s.percent_positive + "%", k: "Positive" }) : /* @__PURE__ */ React.createElement(Kpi, { v: s.roi_area_mm2 != null ? s.roi_area_mm2.toFixed(3) : "\u2014", k: "mm\xB2" })), s && /* @__PURE__ */ React.createElement("div", { className: "sr-tags" }, Object.entries(s.by_class || {}).map(([cl, n]) => /* @__PURE__ */ React.createElement(Tag, { key: cl, color: cl === "Positive" ? "orange" : cl === "Negative" ? "slate" : "primary", title: `${cl} ${n.toLocaleString()}` }))), j.error && /* @__PURE__ */ React.createElement(AlertPanel, { severity: "error", description: j.error }), /* @__PURE__ */ React.createElement(Typography, { variant: "p4", color: "light" }, j.jobId ? `Job ${String(j.jobId).slice(-8)} \xB7 ` : "", el, s?.threshold_used != null ? ` \xB7 threshold ${s.threshold_used}` : "", s?.area_um2?.median != null ? ` \xB7 median ${s.area_um2.median} \xB5m\xB2` : ""), /* @__PURE__ */ React.createElement("div", { className: "sr-btns" }, (s || j.polys) && /* @__PURE__ */ React.createElement(Button, { size: "small", variant: "outlined", startIcon: j.visible ? "visible-eye-hidden" : "show-visible", onClick: () => jobToggle(j) }, j.visible ? j.polys ? "Hide Overlay" : "Hide Cells" : j.polys ? "Show Overlay" : "Show Cells"), (s || j.polys) && /* @__PURE__ */ React.createElement(Button, { size: "small", variant: "ghost", startIcon: "object-search-zoom-plus", onClick: () => jobZoom(j) }, "Zoom To"), s && j.annId && !S.readOnly && /* @__PURE__ */ React.createElement(Button, { size: "small", variant: "ghost", startIcon: "notes-pen", onClick: () => jobNote(j) }, "Add to Note"), /* @__PURE__ */ React.createElement("span", { className: "sr-grow" }), /* @__PURE__ */ React.createElement(Tip, { title: "Remove from List", position: "left" }, /* @__PURE__ */ React.createElement(IconButton, { icon: "close", size: "small", color: "slate", "aria-label": "Remove", onClick: () => jobRemove(j) }))));
+  }
+  function PreviousAnalyses() {
+    const st = PREV.state, aside = st !== "loading" && S.mode !== "demo" && /* @__PURE__ */ React.createElement(Button, { size: "small", variant: "ghost", startIcon: "arrow-rotate-restore", onClick: listPrevious }, st === "idle" ? "Find" : "Refresh");
+    let body;
+    return S.mode === "demo" ? body = /* @__PURE__ */ React.createElement(Typography, { variant: "p3", color: "light" }, "On a site, analyses already run on this slide are listed here and can be shown on it.") : st === "idle" ? body = /* @__PURE__ */ React.createElement(Typography, { variant: "p3", color: "light" }, "Find analyses already run on this slide and show their results on it.") : st === "loading" ? body = /* @__PURE__ */ React.createElement("div", { className: "sr-region" }, /* @__PURE__ */ React.createElement(ProgressSpinner, { size: "small" }), /* @__PURE__ */ React.createElement(Typography, { variant: "p3" }, "Looking for earlier analyses\u2026")) : st === "error" ? body = /* @__PURE__ */ React.createElement(AlertPanel, { severity: "error", title: "Couldn\u2019t List Analyses", description: PREV.why }) : PREV.items.length ? body = /* @__PURE__ */ React.createElement("div", { className: "sr-stack" }, PREV.items.map((it) => {
+      const shown = AZ.jobs.some((j) => j.analysisId === it.id), ok = !it.state || it.state === "complete", verdict = it.an.info?.histoqc?.verdict, c = contractOf(it.gearName)?.slide_review || {}, cnt = Object.values(it.an.info || {}).find((v) => v && typeof v == "object" && typeof v.count == "number")?.count, [jc, jt] = JOB_STATE[it.state] || ["slate", it.state];
+      return /* @__PURE__ */ React.createElement("div", { className: "sr-job", key: it.id }, /* @__PURE__ */ React.createElement("div", { className: "sr-job-h" }, /* @__PURE__ */ React.createElement("span", { className: "sr-row-txt" }, /* @__PURE__ */ React.createElement(Typography, { variant: "h5", overflow: !0 }, c.label || it.gearName), /* @__PURE__ */ React.createElement(Typography, { variant: "p4", color: "light", overflow: !0 }, it.gearName, " ", it.gearVersion, " \xB7 ", fmtWhen(it.created), cnt != null ? ` \xB7 ${cnt.toLocaleString()} objects` : "")), verdict ? /* @__PURE__ */ React.createElement(Tag, { size: "large", color: VERDICT_TAG[verdict] || "slate", title: String(verdict).toUpperCase() }) : it.state && it.state !== "complete" ? /* @__PURE__ */ React.createElement(Tag, { size: "large", color: jc, title: jt }) : null), ok && /* @__PURE__ */ React.createElement("div", { className: "sr-btns" }, /* @__PURE__ */ React.createElement(Button, { size: "small", variant: "outlined", startIcon: shown ? "done-check-tracked" : "show-visible", disabled: shown, onClick: () => loadPrevious(it) }, shown ? "Shown" : "Show on Slide")));
+    }), /* @__PURE__ */ React.createElement(Typography, { variant: "p4", color: "light", title: PREV.stats }, PREV.items.length, " shown \xB7 via ", PREV.via)) : body = /* @__PURE__ */ React.createElement("div", { className: "sr-stack" }, /* @__PURE__ */ React.createElement(Typography, { variant: "p3", color: "light" }, "No earlier analyses from Slide Review gears on this slide."), PREV.stats && /* @__PURE__ */ React.createElement(Typography, { variant: "p4", color: "light" }, PREV.stats)), /* @__PURE__ */ React.createElement(Section, { title: "Previous Analyses", aside }, body);
   }
   function AnalyzePanel() {
+    React.useEffect(() => {
+      maybeListPrevious();
+    }, []);
     const g = AZ.gear, sr = g && srOf(g), ri = g ? regionInfo() : null, hidden = new Set(sr ? sr.hidden_config || [sr.roi_config] : []), fields = g ? Object.entries(g.gear.config || {}).filter(([k]) => !hidden.has(k)) : [];
     return /* @__PURE__ */ React.createElement(
       PanelLayout,
@@ -12396,7 +12409,7 @@ __ds_ns.Tree = __ds_scope.Tree;
         ariaLabel: "Analyze",
         header: /* @__PURE__ */ React.createElement(React.Fragment, null, /* @__PURE__ */ React.createElement("h4", null, "Analyze"), AZ.jobs.length > 0 && /* @__PURE__ */ React.createElement(CountChip, { n: AZ.jobs.length }))
       },
-      g ? /* @__PURE__ */ React.createElement(React.Fragment, null, /* @__PURE__ */ React.createElement(Section, { title: "Gear" }, /* @__PURE__ */ React.createElement("div", { className: "sr-stack" }, AZ.gears.length > 1 ? /* @__PURE__ */ React.createElement(Select, { name: "gear", size: "compact", fullWidth: !0, value: g._id, onChange: pickGear }, AZ.gears.map((x) => /* @__PURE__ */ React.createElement(SelectItem, { key: x._id, value: x._id, title: srOf(x).label || x.gear.label, description: `${x.gear.name} ${x.gear.version}` }))) : /* @__PURE__ */ React.createElement("div", { className: "sr-menu" }, /* @__PURE__ */ React.createElement(MenuItem, { icon: "human-artificial-intelligence", title: sr.label || g.gear.label, description: `${g.gear.name} ${g.gear.version} \xB7 ${g.category || "analysis"}` })), /* @__PURE__ */ React.createElement(Typography, { variant: "p3", className: "sr-clamp", title: g.gear.description }, g.gear.description))), /* @__PURE__ */ React.createElement(Section, { title: "Region" }, /* @__PURE__ */ React.createElement("div", { className: "sr-stack" }, /* @__PURE__ */ React.createElement(ButtonToggle, { value: AZ.region, size: "small", fullWidth: !0, onChange: setRegionMode, "aria-label": "Region" }, /* @__PURE__ */ React.createElement(Button, { value: "selection" }, "Selection"), /* @__PURE__ */ React.createElement(Button, { value: "view" }, "Current View")), ri.reg.error ? /* @__PURE__ */ React.createElement(AlertPanel, { severity: "info", description: ri.reg.error }) : /* @__PURE__ */ React.createElement("div", { className: "sr-region" }, /* @__PURE__ */ React.createElement(Icon, { name: "target", color: "primary", size: "small", decorative: !0 }), /* @__PURE__ */ React.createElement("span", { className: "sr-row-txt" }, /* @__PURE__ */ React.createElement(Typography, { variant: "h5", overflow: !0 }, ri.reg.label), /* @__PURE__ */ React.createElement(Typography, { variant: "p4", color: "light" }, ri.areaText, ri.cap ? ` \xB7 limit ${ri.cap} mm\xB2` : ""))), ri.over && /* @__PURE__ */ React.createElement(AlertPanel, { severity: "warning", description: `Larger than the gear\u2019s ${ri.cap} mm\xB2 limit. Draw a smaller region.` }))), fields.length > 0 && /* @__PURE__ */ React.createElement(Section, null, /* @__PURE__ */ React.createElement(CollapseLayout, { title: "Settings", description: `${fields.length} options from the gear manifest`, dense: !0, bordered: !1, rounded: !1, variant: "inherit", key: g._id }, /* @__PURE__ */ React.createElement("div", { className: "sr-stack sr-mt" }, fields.map(([k, v]) => /* @__PURE__ */ React.createElement(CfgField, { key: g._id + k, k, v }))))), /* @__PURE__ */ React.createElement(Section, null, /* @__PURE__ */ React.createElement("div", { className: "sr-stack" }, !AZ.canRun && /* @__PURE__ */ React.createElement(AlertPanel, { severity: "warning", description: AZ.why }), /* @__PURE__ */ React.createElement(Button, { fullWidth: !0, startIcon: "music-play-resume", disabled: !!ri.reg.error || ri.over || !AZ.canRun, onClick: () => launch(ri.reg) }, (sr.label || "Run") + " in Region"), /* @__PURE__ */ React.createElement(Typography, { variant: "p4", color: "light" }, S.mode === "demo" ? "Demo: runs the gear\u2019s algorithm in your browser. On a site it runs as a Flywheel job." : `Runs as you and creates an analysis on the ${S.container?.container_type || "container"} ${S.container?.label || ""}.`)))) : /* @__PURE__ */ React.createElement("div", { className: "sr-pad sr-stack" }, AZ.why && /* @__PURE__ */ React.createElement(AlertPanel, { severity: "error", description: AZ.why }), /* @__PURE__ */ React.createElement(
+      g ? /* @__PURE__ */ React.createElement(React.Fragment, null, /* @__PURE__ */ React.createElement(Section, { title: "Gear" }, /* @__PURE__ */ React.createElement("div", { className: "sr-stack" }, AZ.gears.length > 1 ? /* @__PURE__ */ React.createElement(Select, { name: "gear", size: "compact", fullWidth: !0, value: g._id, onChange: pickGear }, AZ.gears.map((x) => /* @__PURE__ */ React.createElement(SelectItem, { key: x._id, value: x._id, title: srOf(x).label || x.gear.label, description: `${x.gear.name} ${x.gear.version}` }))) : /* @__PURE__ */ React.createElement("div", { className: "sr-menu" }, /* @__PURE__ */ React.createElement(MenuItem, { icon: "human-artificial-intelligence", title: sr.label || g.gear.label, description: `${g.gear.name} ${g.gear.version} \xB7 ${g.category || "analysis"}` })), /* @__PURE__ */ React.createElement(Typography, { variant: "p3", className: "sr-clamp", title: g.gear.description }, g.gear.description))), /* @__PURE__ */ React.createElement(Section, { title: "Region" }, /* @__PURE__ */ React.createElement("div", { className: "sr-stack" }, /* @__PURE__ */ React.createElement(ButtonToggle, { value: AZ.region, size: "small", fullWidth: !0, onChange: setRegionMode, "aria-label": "Region" }, wholeOK(g) && /* @__PURE__ */ React.createElement(Button, { value: "whole" }, "Whole Slide"), needsRegion(g) && /* @__PURE__ */ React.createElement(Button, { value: "selection" }, wholeOK(g) ? "Annotation" : "Selection"), needsRegion(g) && /* @__PURE__ */ React.createElement(Button, { value: "view" }, wholeOK(g) ? "View" : "Current View")), ri.reg.error ? /* @__PURE__ */ React.createElement(AlertPanel, { severity: "info", description: ri.reg.error }) : /* @__PURE__ */ React.createElement("div", { className: "sr-region" }, /* @__PURE__ */ React.createElement(Icon, { name: "target", color: "primary", size: "small", decorative: !0 }), /* @__PURE__ */ React.createElement("span", { className: "sr-row-txt" }, /* @__PURE__ */ React.createElement(Typography, { variant: "h5", overflow: !0 }, ri.reg.label), /* @__PURE__ */ React.createElement(Typography, { variant: "p4", color: "light" }, ri.areaText, ri.cap ? ` \xB7 limit ${ri.cap} mm\xB2` : ""))), ri.over && /* @__PURE__ */ React.createElement(AlertPanel, { severity: "warning", description: `Larger than the gear\u2019s ${ri.cap} mm\xB2 limit. Draw a smaller region.` }))), fields.length > 0 && /* @__PURE__ */ React.createElement(Section, null, /* @__PURE__ */ React.createElement(CollapseLayout, { title: "Settings", description: `${fields.length} options from the gear manifest`, dense: !0, bordered: !1, rounded: !1, variant: "inherit", key: g._id }, /* @__PURE__ */ React.createElement("div", { className: "sr-stack sr-mt" }, fields.map(([k, v]) => /* @__PURE__ */ React.createElement(CfgField, { key: g._id + k, k, v }))))), /* @__PURE__ */ React.createElement(Section, null, /* @__PURE__ */ React.createElement("div", { className: "sr-stack" }, !AZ.canRun && /* @__PURE__ */ React.createElement(AlertPanel, { severity: "warning", description: AZ.why }), /* @__PURE__ */ React.createElement(Button, { fullWidth: !0, startIcon: "music-play-resume", disabled: !!ri.reg.error || ri.over || !AZ.canRun, onClick: () => launch(ri.reg) }, (sr.label || "Run") + (ri.reg.whole ? " on Whole Slide" : " in Region")), /* @__PURE__ */ React.createElement(Typography, { variant: "p4", color: "light" }, S.mode === "demo" ? "Demo: runs the gear\u2019s algorithm in your browser. On a site it runs as a Flywheel job." : `Runs as you and creates an analysis on the ${S.container?.container_type || "container"} ${S.container?.label || ""}.`)))) : /* @__PURE__ */ React.createElement("div", { className: "sr-pad sr-stack" }, AZ.why && /* @__PURE__ */ React.createElement(AlertPanel, { severity: "error", description: AZ.why }), /* @__PURE__ */ React.createElement(
         ContextLayout,
         {
           size: "compact",
@@ -12406,7 +12419,8 @@ __ds_ns.Tree = __ds_scope.Tree;
           description: `A gear appears here when its manifest declares custom["fw-apps"].slide_review${S.sourceKind === "dicom" ? ' and lists "dicom-zip" in formats' : ""}. Install slide-cell-count to count cells.`
         }
       )),
-      /* @__PURE__ */ React.createElement(Section, { title: "Results" }, AZ.jobs.length ? /* @__PURE__ */ React.createElement("div", { className: "sr-stack" }, AZ.jobs.map((j) => /* @__PURE__ */ React.createElement(JobCard, { key: j.key, j }))) : /* @__PURE__ */ React.createElement(Typography, { variant: "p3", color: "light" }, "No analyses run in this session."))
+      /* @__PURE__ */ React.createElement(Section, { title: "Results" }, AZ.jobs.length ? /* @__PURE__ */ React.createElement("div", { className: "sr-stack" }, AZ.jobs.map((j) => /* @__PURE__ */ React.createElement(JobCard, { key: j.key, j }))) : /* @__PURE__ */ React.createElement(Typography, { variant: "p3", color: "light" }, "No analyses run in this session.")),
+      /* @__PURE__ */ React.createElement(PreviousAnalyses, null)
     );
   }
   function SlidePanel() {
@@ -12874,7 +12888,7 @@ async function runCellCountLocal(points, cfg, roiId, maxPx = 9e6) { // the demo'
 }
 
 /* ---- gear discovery and the Analyze panel ---- */
-const AZ = { gears: [], gear: null, region: 'selection', cfg: {}, jobs: [], canRun: true, why: '' };
+const AZ = { gears: [], allGears: [], gear: null, region: 'selection', cfg: {}, jobs: [], canRun: true, why: '' };
 const srOf = g => g?.gear?.custom?.['fw-apps']?.slide_review;
 async function discoverGears() {
   if (S.mode === 'demo') { AZ.gears = (window.DEMO_GEARS || []).slice(); }
@@ -12882,6 +12896,7 @@ async function discoverGears() {
     try {
       const all = await timed('sdk', 'listGears', () => S.ext.listGears({ limit: 500 }));
       const list = Array.isArray(all) ? all : all?.results || [];
+      AZ.allGears = list.filter(g => srOf(g));
       const allow = Array.isArray(S.ext.params?.gears) ? S.ext.params.gears : null;
       AZ.gears = list.filter(g => !g.disabled && srOf(g) && (!allow || allow.includes(g.gear.name)) && (srOf(g).formats || ['svs', 'tiff']).includes(S.sourceKind === 'dicom' ? 'dicom-zip' : (/\.svs$/i.test(S.slideName || '') ? 'svs' : 'tiff')));
       // keep the newest version of each gear name
@@ -12890,8 +12905,12 @@ async function discoverGears() {
     } catch (e) { AZ.gears = []; AZ.why = 'Could not list gears: ' + (e.message || e); }
   }
   AZ.gear = AZ.gears[0] || null;
+  if (S.mode === 'demo') AZ.allGears = AZ.gears;
+  if (AZ.gear) AZ.region = wholeOK(AZ.gear) ? 'whole' : 'selection';
   resetCfg();
 }
+function wholeOK(g) { const sr = g && srOf(g); return !!sr && (sr.whole_slide === true || !sr.roi_config); }
+function needsRegion(g) { const sr = g && srOf(g); return !!sr && !!sr.roi_config; }
 function cmpVer(a, b) { const pa = String(a).split(/[.-]/).map(Number), pb = String(b).split(/[.-]/).map(Number); for (let i = 0; i < 3; i++) { if ((pa[i] || 0) !== (pb[i] || 0)) return (pa[i] || 0) - (pb[i] || 0); } return 0; }
 function resetCfg() { AZ.cfg = {}; const c = AZ.gear?.gear?.config || {}; for (const [k, v] of Object.entries(c)) if (v.default !== undefined) AZ.cfg[k] = v.default; }
 function closedRing(a) {
@@ -12900,6 +12919,9 @@ function closedRing(a) {
   const rings = ringsOf(sel); return rings ? rings[0] : null;
 }
 function currentRegion() {
+  if (AZ.region === 'whole' && wholeOK(AZ.gear)) return { whole: true, pts: [[0, 0], [S.W, 0], [S.W, S.H], [0, S.H]], id: 'whole', label: 'Whole Slide' };
+  if (AZ.region === 'whole' || !needsRegion(AZ.gear)) AZ.region = needsRegion(AZ.gear) ? 'selection' : 'whole';
+  if (AZ.region === 'whole') return currentRegion();
   if (AZ.region === 'selection') {
     const a = S.selected && anno.getAnnotationById(S.selected);
     if (!a) return { error: 'Select a closed annotation (rectangle, ellipse, polygon or closed path) to use as the region.' };
@@ -12914,16 +12936,20 @@ function currentRegion() {
   return { pts, id: 'view' + Date.now().toString(36).slice(-5), label: 'Current view' };
 }
 function renderAnalyze() { emit(); }
+function maybeListPrevious() { if (PREV.state === 'idle' && S.mode !== 'demo' && S.ext && S.panel === 'analyze') { PREV.state = 'loading'; setTimeout(listPrevious, 0); } }
 const JOB_STATE = { queued: ['slate', 'Queued'], pending: ['slate', 'Queued'], running: ['primary', 'Running'], complete: ['green', 'Complete'], failed: ['red', 'Failed'], cancelled: ['slate', 'Cancelled'], loading: ['primary', 'Loading Results'] };
 function regionInfo() {
   if (!AZ.gear || !viewer) return { reg: { error: 'Slide not open yet.' } };
   const sr = srOf(AZ.gear), reg = currentRegion(), mpp = S.mpp;
   const area = reg.pts ? polyArea(reg.pts) * (mpp ? mpp * mpp / 1e6 : 0) : 0;
   const cap = sr.max_roi_config ? +AZ.cfg[sr.max_roi_config] || null : null;
-  return { reg, area, cap, over: !!(cap && area > cap), areaText: reg.pts ? (mpp ? fmtArea(area * 1e6) : Math.round(polyArea(reg.pts)).toLocaleString() + ' px²') : '' };
+  return { reg, area, cap, over: !!(cap && !reg.whole && area > cap), areaText: reg.pts ? (mpp ? fmtArea(area * 1e6) : Math.round(polyArea(reg.pts)).toLocaleString() + ' px²') : '' };
 }
 function jobToggle(j) { j.visible = !j.visible; drawOverlay(); emit(); }
-function jobZoom(j) { const xs = j.roi.map(p => p[0]), ys = j.roi.map(p => p[1]); viewer.viewport.fitBounds(viewer.viewport.imageToViewportRectangle(Math.min(...xs), Math.min(...ys), Math.max(...xs) - Math.min(...xs), Math.max(...ys) - Math.min(...ys))); }
+function jobZoom(j) {
+  const rp = (j.polys || []).find(p => p.mask === 'region'); const box = j.roi || (rp ? rp.parts[0][0] : null);
+  if (!box) { viewer.viewport.goHome(); return; }
+  const xs = box.map(p => p[0]), ys = box.map(p => p[1]); viewer.viewport.fitBounds(viewer.viewport.imageToViewportRectangle(Math.min(...xs), Math.min(...ys), Math.max(...xs) - Math.min(...xs), Math.max(...ys) - Math.min(...ys))); }
 function jobRemove(j) { AZ.jobs = AZ.jobs.filter(x => x !== j); drawOverlay(); emit(); }
 function jobNote(j) {
   const a = anno.getAnnotationById(j.annId); if (!a) return toast('That annotation no longer exists', 3200, 'warning');
@@ -12931,20 +12957,22 @@ function jobNote(j) {
   const prev = noteOf(a); setAnnNote(a, prev ? prev + '\n' + line : line); toast('Added to the annotation’s note. Save to keep it.', 3600, 'success');
 }
 function setCfg(k, v) { AZ.cfg[k] = v; emit(); }
-function pickGear(id) { AZ.gear = AZ.gears.find(x => x._id === id) || AZ.gear; resetCfg(); emit(); }
+function pickGear(id) { AZ.gear = AZ.gears.find(x => x._id === id) || AZ.gear; AZ.region = wholeOK(AZ.gear) ? 'whole' : 'selection'; resetCfg(); emit(); }
 function setRegionMode(m) { AZ.region = m; emit(); }
 let jobSeq = 0;
 async function launch(reg) {
   const g = AZ.gear, sr = srOf(g);
-  const cfg = { ...AZ.cfg, [sr.roi_config]: JSON.stringify({ id: reg.id, points: reg.pts }) };
+  const cfg = { ...AZ.cfg };
+  if (sr.roi_config) { if (reg.whole) delete cfg[sr.roi_config]; else cfg[sr.roi_config] = JSON.stringify({ id: reg.id, points: reg.pts }); }
   for (const [k, v] of Object.entries(cfg)) if (v === undefined || v === '') delete cfg[k];
-  const j = { key: ++jobSeq, label: sr.label || g.gear.label, gearName: g.gear.name, gearVersion: g.gear.version, roi: reg.pts, roiLabel: reg.label, annId: reg.annId, state: 'queued', start: Date.now(), visible: true };
+  const j = { key: ++jobSeq, label: sr.label || g.gear.label, gearName: g.gear.name, gearVersion: g.gear.version, roi: reg.whole ? null : reg.pts, roiLabel: reg.label, annId: reg.annId, state: 'queued', start: Date.now(), visible: true };
   AZ.jobs.unshift(j); S.panel = 'analyze'; emit(); tickJobs();
   try {
     if (S.mode === 'demo') {
       await new Promise(r => setTimeout(r, 900)); j.state = 'running'; renderAnalyze();
       await new Promise(r => setTimeout(r, 50));
       const fc = await timed('demo-gear', `${g.gear.name} on ${reg.label}`, () => runCellCountLocal(reg.pts, AZ.cfg, reg.id));
+      j.render = (contractOf(g.gear.name)?.outputs || []).find(o => o.role === 'primary')?.render || 'points';
       finishJob(j, fc);
     } else {
       const input = { type: S.file.parent_ref.type, id: S.file.parent_ref.id, name: S.file.name };
@@ -12974,22 +13002,144 @@ async function pollJob(j) {
     await new Promise(r => setTimeout(r, wait)); wait = Math.min(10000, wait * 1.4);
   }
   j.state = 'loading'; renderAnalyze();
-  const sr = AZ.gears.find(x => x.gear.name === j.gearName)?.gear?.custom?.['fw-apps'] || {};
-  const pat = (sr.outputs || []).find(o => o.role === 'primary')?.name_pattern || '*.geojson';
-  const re = new RegExp('^' + pat.split('*').map(s => s.replace(/[.+?^${}()|[\]\\]/g, '\\$&')).join('.*') + '$');
   const an = await timed('sdk', 'getContainer analysis (outputs)', () => S.ext.getContainer('analysis', j.analysisId));
+  await loadOutputs(j, an);
+}
+function contractOf(gearName) { // fw-apps block of the installed gear with this name (any version)
+  return (AZ.allGears.length ? AZ.allGears : AZ.gears).find(x => x.gear.name === gearName)?.gear?.custom?.['fw-apps'] || null;
+}
+function patRe(pat) { return new RegExp('^' + pat.split('*').map(s => s.replace(/[.+?^${}()|[\]\\]/g, '\\$&')).join('.*') + '$'); }
+async function loadOutputs(j, an) { // read the primary output + info summary of an analysis and draw it
+  const sr = contractOf(j.gearName) || {};
+  const prim = (sr.outputs || []).find(o => o.role === 'primary') || {};
+  const pat = prim.name_pattern || '*.geojson';
+  j.render = prim.render || 'points';
+  const re = patRe(pat);
   const out = (an.files || []).filter(f => re.test(f.name)).sort((a, b) => (b.modified || '').localeCompare(a.modified || ''))[0];
-  if (!out) throw new Error(`The job finished but no output matches ${pat}.`);
-  const txt = await timed('sdk', `getFileText ${out.name}`, () => S.ext.getFileText(out));
+  if (!out) throw new Error(`No output in this analysis matches ${pat}.`);
+  // gear summary from analysis info (written by the gear's .metadata.json), via the report output's info_paths
+  const infoPath = (sr.outputs || []).map(o => (o.info_paths || [])[0]).find(Boolean);
+  if (infoPath) j.info = String(infoPath).split('.').reduce((o, k) => o?.[k], an.info || {}) || null;
+  const fileRef = out.parent_ref ? out : { ...out, parent_ref: { type: 'analysis', id: an._id } };
+  const txt = await timed('sdk', `getFileText ${out.name}`, () => S.ext.getFileText(fileRef));
   finishJob(j, JSON.parse(txt));
 }
+function polysOf(fc) { // Polygon / MultiPolygon features -> [{name, color, rings}] in level-0 px
+  const out = [];
+  for (const f of fc.features || []) {
+    const gm = f.geometry; if (!gm) continue;
+    const parts = gm.type === 'Polygon' ? [gm.coordinates] : gm.type === 'MultiPolygon' ? gm.coordinates : [];
+    if (!parts.length) continue;
+    const c = f.properties?.classification || {};
+    out.push({ name: c.name || 'Region', color: Array.isArray(c.color) ? c.color : [200, 200, 200], mask: f.properties?.histoqc_mask, area: f.properties?.measurements?.area_mm2, pct: f.properties?.measurements?.pct_of_tissue, parts });
+  }
+  return out;
+}
 function finishJob(j, fc) {
-  j.fc = fc; j.summary = fc.properties?.summary || { count: fc.features.length, by_class: {} };
-  j.points = fc.features.filter(f => f.geometry?.type === 'Point').map(f => [f.geometry.coordinates[0], f.geometry.coordinates[1], f.properties?.classification?.name || 'Nucleus']);
+  j.fc = fc;
+  if (j.render === 'polygons') {
+    j.polys = polysOf(fc); j.summary = null;
+  } else if (j.render === 'contours') { // detections with outlines: dots when zoomed out, outlines when in
+    const dets = (fc.features || []).filter(f => f.properties?.objectType !== 'annotation');
+    j.summary = fc.properties?.summary || { count: dets.length, by_class: {} };
+    j.points = []; j.contours = [];
+    for (const f of dets) {
+      const cls = f.properties?.classification?.name || 'Nucleus', gm = f.geometry;
+      const ring = gm?.type === 'Polygon' ? gm.coordinates[0] : null;
+      const c = f.properties?.centroid || (gm?.type === 'Point' ? gm.coordinates : ring ? ring.reduce((a, p) => [a[0] + p[0] / ring.length, a[1] + p[1] / ring.length], [0, 0]) : null);
+      if (!c) continue;
+      j.points.push([c[0], c[1], cls]);
+      if (ring) { let x0 = Infinity, y0 = Infinity, x1 = -Infinity, y1 = -Infinity; const flat = new Float64Array(ring.length * 2);
+        ring.forEach(([x, y], i) => { flat[2 * i] = x; flat[2 * i + 1] = y; if (x < x0) x0 = x; if (x > x1) x1 = x; if (y < y0) y0 = y; if (y > y1) y1 = y; });
+        j.contours.push({ cls, flat, x0, y0, x1, y1 }); }
+    }
+    const r = fc.properties?.roi?.coordinates?.[0]; if (!j.roi && r) j.roi = r.map(p => [p[0], p[1]]);
+  } else {
+    j.summary = fc.properties?.summary || { count: fc.features.length, by_class: {} };
+    j.points = fc.features.filter(f => f.geometry?.type === 'Point').map(f => [f.geometry.coordinates[0], f.geometry.coordinates[1], f.properties?.classification?.name || 'Nucleus']);
+    const r = fc.properties?.roi?.coordinates?.[0]; if (!j.roi && r) j.roi = r.map(p => [p[0], p[1]]);
+  }
   j.state = 'complete'; j.end = Date.now();
   renderAnalyze(); drawOverlay();
-  toast(`${j.label}: ${j.summary.count.toLocaleString()} cells`, 3600, 'success');
+  toast(j.info?.verdict ? `${j.label}: ${String(j.info.verdict).toUpperCase()}` : j.summary ? `${j.label}: ${j.summary.count.toLocaleString()} ${j.render === 'contours' ? 'nuclei' : 'cells'}` : `${j.label}: done`, 3600, j.info?.verdict === 'fail' ? 'error' : j.info?.verdict === 'review' ? 'warning' : 'success');
 }
+const VERDICT_TAG = { pass: 'green', review: 'orange', fail: 'red' };
+function polyLegend(j) { return (j.polys || []).filter((p, k, a) => p.mask !== 'region' && a.findIndex(q => q.name === p.name) === k); }
+/* ---- previous analyses on this slide ---- */
+const PREV = { state: 'idle', items: [], why: '', via: '', stats: '' };
+function analysisInputs(an) { // names/ids of the files an analysis took as inputs (shape varies by API)
+  const ins = an.inputs || an.job?.inputs || [];
+  const arr = Array.isArray(ins) ? ins : Object.values(ins);
+  return arr.map(i => ({ name: i.name || i.location?.name, id: i.file_id || i._id || i.id }));
+}
+function usesThisSlide(an) {
+  const ins = analysisInputs(an);
+  if (!ins.length) return true; // unknown shape: keep, the slide's own container already scopes it
+  return ins.some(i => (S.file?.file_id && i.id === S.file.file_id) || i.name === S.file?.name);
+}
+async function listPrevious() {
+  if (S.mode === 'demo') { PREV.state = 'done'; PREV.items = []; PREV.via = 'demo'; renderAnalyze(); return; }
+  PREV.state = 'loading'; PREV.why = ''; PREV.stats = ''; renderAnalyze();
+  const parent = S.container, ptype = parent.container_type || S.file.parent_ref?.type || 'acquisition', pid = parent._id;
+  const sesId = parent.parents?.session || S.file.parents?.session;
+  const listOf = r => Array.isArray(r) ? r : Array.isArray(r?.results) ? r.results : Array.isArray(r?.analyses) ? r.analyses : null;
+  const tries = [
+    ['getChildContainers analysis', () => S.ext.getChildContainers(parent, 'analysis', { limit: 200 })],
+    [`GET /api/${ptype}s/…/analyses`, () => S.ext.apiRequest('GET', `/api/${ptype}s/${pid}/analyses`, { inflate_job: true })],
+    ['getContainer (analyses field)', async () => (await S.ext.getContainer(ptype, pid)).analyses],
+    ['listContainers analysis', () => S.ext.listContainers('analysis', { filter: `parent.id=${pid}`, limit: 200 })],
+    sesId && ['GET /api/sessions/…/analyses', () => S.ext.apiRequest('GET', `/api/sessions/${sesId}/analyses`, { inflate_job: true })],
+    ['GET /api/jobs → analyses', async () => {
+      const r = await S.ext.apiRequest('GET', '/api/jobs', { limit: 100, sort: 'created:desc', filter: `parents.${ptype}=${pid}` });
+      const jobs = listOf(r) || [];
+      const ids = [...new Set(jobs.filter(jb => jb.destination?.type === 'analysis').map(jb => jb.destination.id))];
+      return Promise.all(ids.map(id => S.ext.getContainer('analysis', id).catch(() => null))).then(a => a.filter(Boolean));
+    }],
+  ].filter(Boolean);
+  const byId = new Map(), got = [], errs = [];
+  for (const [name, fn] of tries) { // run them all: hosts differ in which work, and an empty list from one isn't proof
+    try {
+      const arr = listOf(await timed('sdk', name, fn));
+      if (!arr) { got.push(`${name}: no list`); continue; }
+      got.push(`${name}: ${arr.length}`);
+      for (const an of arr) { const id = an?._id || an?.id; if (id && !byId.has(id)) byId.set(id, { ...an, _id: id }); }
+    } catch (e) { errs.push(`${name}: ${e.message || e}`); }
+  }
+  if (!byId.size && errs.length === tries.length) { PREV.state = 'error'; PREV.why = errs.join(' · '); renderAnalyze(); return; }
+  // list endpoints can omit gear_info / inputs: fill those from the analysis itself
+  const ans = await Promise.all([...byId.values()].map(async an => {
+    if (gearOf(an) && (an.inputs || an.job?.inputs)) return an;
+    try { return { ...an, ...(await S.ext.getContainer('analysis', an._id)) }; } catch { return an; }
+  }));
+  let noGear = 0, otherGear = 0, otherSlide = 0;
+  PREV.items = ans.filter(an => {
+    const name = gearOf(an);
+    if (!name) { noGear++; return false; }
+    if (!contractOf(name)) { otherGear++; return false; }
+    if (!usesThisSlide(an)) { otherSlide++; return false; }
+    return true;
+  }).map(an => ({ an, id: an._id, gearName: gearOf(an), gearVersion: an.gear_info?.version || an.job?.gear_info?.version || '',
+    created: an.created || an.job?.created, label: an.label, state: an.job?.state || (an.files?.length ? 'complete' : '') }))
+    .sort((a, b) => String(b.created || '').localeCompare(String(a.created || '')));
+  PREV.via = got.filter(g => !/: 0$|no list/.test(g)).map(g => g.split(':')[0]).join(', ') || 'none';
+  PREV.stats = `${ans.length} analyses found (${got.join('; ')}${errs.length ? '; failed: ' + errs.map(e => e.split(':')[0]).join(', ') : ''}); skipped ${noGear} without gear info, ${otherGear} from other gears, ${otherSlide} on other files.`;
+  PREV.state = 'done'; renderAnalyze();
+}
+function gearOf(an) { return an.gear_info?.name || an.job?.gear_info?.name || an.job?.gear?.name || null; }
+async function loadPrevious(item) {
+  if (AZ.jobs.some(j => j.analysisId === item.id)) { toast('Already shown in Results'); return; }
+  const c = contractOf(item.gearName), sr = c?.slide_review || {};
+  const j = { key: ++jobSeq, label: sr.label || item.gearName, gearName: item.gearName, gearVersion: item.gearVersion, roi: null,
+    roiLabel: 'Earlier · ' + fmtWhen(item.created), analysisId: item.id, jobId: typeof item.an.job === 'string' ? item.an.job : item.an.job?._id || item.an.job?.id,
+    state: 'loading', start: Date.now(), visible: true, previous: true };
+  AZ.jobs.unshift(j); renderAnalyze();
+  try {
+    const an = item.an.files ? item.an : await timed('sdk', 'getContainer analysis', () => S.ext.getContainer('analysis', item.id));
+    await loadOutputs(j, an);
+    j.end = j.start; // no run time for an earlier analysis
+  } catch (e) { j.state = 'failed'; j.error = e.message || String(e); j.end = Date.now(); renderAnalyze(); }
+}
+function fmtWhen(t) { if (!t) return 'unknown date'; const d = new Date(t); return isNaN(d) ? String(t) : d.toISOString().slice(0, 16).replace('T', ' ') + 'Z'; }
 function tickJobs() { clearInterval(tickJobs.t); tickJobs.t = setInterval(() => { if (!AZ.jobs.some(j => !j.end)) return clearInterval(tickJobs.t); if (S.panel === 'analyze') emit(); }, 1000); }
 
 /* ---- detections layer: one canvas over the slide, redrawn with the viewport ---- */
@@ -13005,14 +13155,42 @@ function drawOverlay() {
   const dpr = window.devicePixelRatio || 1, W = viewer.canvas.clientWidth, H = viewer.canvas.clientHeight;
   if (ovCanvas.width !== Math.round(W * dpr) || ovCanvas.height !== Math.round(H * dpr)) { ovCanvas.width = Math.round(W * dpr); ovCanvas.height = Math.round(H * dpr); ovCanvas.style.width = W + 'px'; ovCanvas.style.height = H + 'px'; }
   const g = ovCanvas.getContext('2d'); g.setTransform(dpr, 0, 0, dpr, 0, 0); g.clearRect(0, 0, W, H);
-  const layers = AZ.jobs.filter(j => j.visible && j.points); if (!layers.length || S.hidden) return;
+  const layers = AZ.jobs.filter(j => j.visible && (j.points || j.polys)); if (!layers.length || S.hidden) return;
   const vp = viewer.viewport, o = vp.imageToViewerElementCoordinates(new OpenSeadragon.Point(0, 0)), e = vp.imageToViewerElementCoordinates(new OpenSeadragon.Point(1000, 0));
   const s = (e.x - o.x) / 1000; // screen px per image px
   const rad = Math.max(1.5, Math.min(7, 3 / (S.mpp || 0.5) * s));
   for (const j of layers) {
-    g.setLineDash([6, 4]); g.strokeStyle = 'rgba(255,255,255,.85)'; g.lineWidth = 1.5; g.beginPath();
-    j.roi.forEach(([x, y], i) => { const X = o.x + x * s, Y = o.y + y * s; i ? g.lineTo(X, Y) : g.moveTo(X, Y); }); g.closePath(); g.stroke(); g.setLineDash([]);
+    if (j.roi) {
+      g.setLineDash([6, 4]); g.strokeStyle = 'rgba(255,255,255,.85)'; g.lineWidth = 1.5; g.beginPath();
+      j.roi.forEach(([x, y], i) => { const X = o.x + x * s, Y = o.y + y * s; i ? g.lineTo(X, Y) : g.moveTo(X, Y); }); g.closePath(); g.stroke(); g.setLineDash([]);
+    }
+    if (j.polys) { // filled class polygons, holes via even-odd; usable tissue drawn as outline only
+      for (const p of j.polys) {
+        if (p.mask === 'region') { // region a gear ran on: dashed outline (live runs already draw j.roi)
+          if (j.roi) continue;
+          g.setLineDash([6, 4]); g.strokeStyle = 'rgba(255,255,255,.85)'; g.lineWidth = 1.5; g.beginPath();
+          for (const poly of p.parts) for (const ring of poly) ring.forEach(([x, y], i) => { const X = o.x + x * s, Y = o.y + y * s; i ? g.lineTo(X, Y) : g.moveTo(X, Y); });
+          g.stroke(); g.setLineDash([]); continue;
+        }
+        g.beginPath();
+        for (const poly of p.parts) for (const ring of poly) ring.forEach(([x, y], i) => { const X = o.x + x * s, Y = o.y + y * s; i ? g.lineTo(X, Y) : g.moveTo(X, Y); });
+        const c = p.color.join(',');
+        if (p.mask === 'mask_use') { g.strokeStyle = `rgb(${c})`; g.lineWidth = 2; g.stroke(); }
+        else { g.fillStyle = `rgba(${c},.35)`; g.fill('evenodd'); g.strokeStyle = `rgb(${c})`; g.lineWidth = 1.2; g.stroke(); }
+      }
+      continue;
+    }
     if (s < 0.02) continue; // too far out to read individual cells
+    if (j.contours?.length && s >= 0.35) { // close enough to see shapes: draw outlines of nuclei in view
+      const vx0 = -o.x / s, vy0 = -o.y / s, vx1 = (W - o.x) / s, vy1 = (H - o.y) / s, byCls = new Map();
+      for (const c of j.contours) { if (c.x1 < vx0 || c.x0 > vx1 || c.y1 < vy0 || c.y0 > vy1) continue; (byCls.get(c.cls) || byCls.set(c.cls, []).get(c.cls)).push(c.flat); }
+      for (const [cls, rings] of byCls) {
+        const c = DET_COLORS[cls] || [200, 200, 200]; g.beginPath();
+        for (const f of rings) { for (let i = 0; i < f.length; i += 2) { const X = o.x + f[i] * s, Y = o.y + f[i + 1] * s; i ? g.lineTo(X, Y) : g.moveTo(X, Y); } g.closePath(); }
+        g.fillStyle = `rgba(${c.join(',')},.18)`; g.fill(); g.strokeStyle = `rgb(${c.join(',')})`; g.lineWidth = s > 2 ? 2 : 1.3; g.stroke();
+      }
+      continue;
+    }
     const groups = new Map();
     for (const p of j.points) { const X = o.x + p[0] * s, Y = o.y + p[1] * s; if (X < -8 || Y < -8 || X > W + 8 || Y > H + 8) continue; (groups.get(p[2]) || groups.set(p[2], []).get(p[2])).push(X, Y); }
     for (const [cls, arr] of groups) {
@@ -13024,7 +13202,7 @@ function drawOverlay() {
 }
 
 'use strict';
-const APP = 'slide-review', VERSION = '0.3.1';
+const APP = 'slide-review', VERSION = '0.6.0';
 const $ = s => document.querySelector(s);
 const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 
